@@ -2,7 +2,8 @@ import React, {Component} from "react";
 import ReactDOM from "react-dom";
 import './tesseract.css';
 import * as THREE from "three";
-import * as OrbitControls from "three-orbitcontrols"
+import * as OrbitControls from "three-orbitcontrols";
+import * as TWEEN from "tween";
 
 export default function Tesseract() {
     
@@ -20,15 +21,16 @@ export default function Tesseract() {
     renderer.setClearColor( 0x545454, 1 );
     document.body.appendChild( renderer.domElement );
 
-    
+    scene.background = new THREE.Color(0xbbd6ff);
+	scene.fog = new THREE.Fog(0xffffff, 0, 750);
     
 
     var spotLight = new THREE.DirectionalLight( {color:0xffffff});
-    spotLight.position.set( -2, 4, 6 );
+    spotLight.position.set( -2, 3, 4 );
     scene.add( spotLight );
 
     var spotLight2 = new THREE.DirectionalLight( {color:0xffffff});
-    spotLight2.position.set( 2, -4, -6 );
+    spotLight2.position.set( 2, -3, -4 );
      scene.add( spotLight2 );
 
     // var light = new THREE.AmbientLight( {color:0xffffff});
@@ -47,11 +49,11 @@ export default function Tesseract() {
     var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.position.y = -2.5;
 	floor.rotation.x = Math.PI / 2;
-	scene.add(floor);
+	// scene.add(floor);
     
     let cubeDims = 5
     for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
-        let geometry = new THREE.BoxGeometry(0.95,0.95,0.95);
+        let geometry = new THREE.BoxGeometry(0.99,0.99,0.99);
         const material = new THREE.MeshPhongMaterial({
             color: 0x00afaf,
             vertexColors: THREE.FaceColors 
@@ -74,6 +76,11 @@ export default function Tesseract() {
     for(let cube in cubes){
         cubes[cube].position.set(...cubePositions[cube])
     }
+
+    let start = new THREE.Vector3();
+    start = {x:2,y:2,z:1};
+
+    
 
     // scene.add(groupCubes);
     var controls = new OrbitControls( camera, renderer.domElement );
@@ -117,32 +124,134 @@ export default function Tesseract() {
 	var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
     ray.setFromCamera( mouse, camera );
 	var intersects = ray.intersectObjects( scene.children, true );
-    console.log(intersects[0].object.position);
     console.log(intersects);
-    // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
-    let faceIndex = intersects[0].faceIndex;
-    intersects[0].object.geometry.faces[faceIndex].color.setRGB( 0.8 * Math.random() + 0.2, 25, 45 ); 
-    if(faceIndex === 0 || faceIndex%2 === 0){
-        intersects[0].object.geometry.faces[faceIndex + 1].color.setRGB( 0.8 * Math.random() + 0.2, 25, 45 ); 
+    if(intersects.length > 0){
+
+        console.log(intersects[0].object.position);
+        // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
+        let faceIndex = intersects[0].faceIndex;
+        let position = new THREE.Vector3();
+    position = intersects[0].object.position;
+
+
+    let normal = new THREE.Vector3();
+    normal = intersects[0].face.normal;
+
+    let offsetX, offsetY, offsetZ = 0;
+    let geoX, geoY, geoZ = 0;
+
+    if(normal.x === 1){
+        offsetX = 1;
+        offsetY = 0;
+        offsetZ = 0;
+        geoX = Math.floor(Math.random() * 3) + 1;
+        geoY = 0.95;
+        geoZ = 0.95;
     }
-    else{
-        intersects[0].object.geometry.faces[faceIndex - 1].color.setRGB( 0.8 * Math.random() + 0.2, 25, 45 ); 
+    else if (normal.y === 1){
+        offsetX = 0;
+        offsetY = 1;
+        offsetZ = 0;
+        geoY = Math.floor(Math.random() * 3) + 1;
+        geoX = 0.95;
+        geoZ = 0.95;
     }
-    // intersects[0].object.material.emissive.setHex((0.1 * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
-    intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+    else if (normal.z === 1){
+        offsetX = 0;
+        offsetY = 0;
+        offsetZ = 1;
+        geoZ = Math.floor(Math.random() * 3) + 1;
+        geoX = 0.95;
+        geoY = 0.95;
+    }
+    else if(normal.x === -1){
+        offsetX = -1;
+        offsetY = 0;
+        offsetZ = 0;
+        geoX = Math.floor(Math.random() * 3) + 1;
+        geoY= 0.95; 
+        geoZ = 0.95;
+    }
+    else if (normal.y === -1){
+        offsetX = 0;
+        offsetY = -1;
+        offsetZ = 0;
+        geoY = Math.floor(Math.random() * 3) + 1;
+        geoX = 0.95;
+        geoZ = 0.95;
+    }
+    else if (normal.z === -1){
+        offsetX = 0;
+        offsetY = 0;
+        offsetZ = -1;
+        geoZ = Math.floor(Math.random() * 3) + 1;
+        geoX= 0.95; 
+        geoY = 0.95;
+    }
+
+    
+    
+
+    if(intersects[0].object.geometry.name !== "obstacle"){
+        console.log("creating obstacle");
+        let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
+        geometry.name = "obstacle";
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x00f00f,
+            vertexColors: THREE.FaceColors 
+        });
+            let obstacle = new THREE.Mesh(geometry, material);
+        obstacle.position.set(position.x + offsetX, position.y + offsetY, position.z + offsetZ);
+        // groupCubes.add(cubes[cubeNum]);
+        obstacle.castShadow = true;
+        obstacle.receiveShadow = true;
+        scene.add(obstacle); 
+        obstacle.position.setY = 25;
+        new TWEEN.Tween(obstacle.position)
+                        .to({ y: 10}, 2000)
+                        .easing(TWEEN.Easing.Bounce.Out)
+                        .start();
+                        
+    
+    // intersects[0].object.geometry.faces[faceIndex].color.setRGB( 54, 25, 45 ); 
+    // if(faceIndex === 0 || faceIndex%2 === 0){
+    //     intersects[0].object.geometry.faces[faceIndex + 1].color.setRGB( 54, 25, 45 ); 
+    // }
+    // else{
+    //     intersects[0].object.geometry.faces[faceIndex - 1].color.setRGB( 54, 25, 45 ); 
+    // }
+    // intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+}
+else{
+    console.log("remving obstacle", intersects[0].object.uuid);
+    let uuid = intersects[0].object.uuid;
+    const object = scene.getObjectByProperty( 'uuid', uuid );
+    console.log(object);
+    object.geometry.dispose();
+    object.material.dispose();
+    scene.remove( object );
+}
+// intersects[0].object.material.emissive.setHex((0.1 * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
 	// // if there is one (or more) intersections
 	// if ( intersects.length > 0 )
 	// {
-	// 	console.log("Hit @ " + toString( intersects[0].point ) );
-	// 	// change the color of the closest face.
-	// 	intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
-	// 	intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
-	// }
-
+        // 	console.log("Hit @ " + toString( intersects[0].point ) );
+        // 	// change the color of the closest face.
+        // 	intersects[ 0 ].face.color.setRGB( 0.8 * Math.random() + 0.2, 0, 0 ); 
+        // 	intersects[ 0 ].object.geometry.colorsNeedUpdate = true;
+        // }
+        
+    }
+    
 }
-
     animate();
     console.log("scene created");
     
+
+function coordsToIndex(coords){
+    let start_index = new THREE.Vector3();
+    start_index = {x:Math.floor(cubeDims / 2),y:Math.floor(cubeDims / 2),z:Math.floor(cubeDims / 2)};
+
+}
  
 }
