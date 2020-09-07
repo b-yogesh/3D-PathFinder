@@ -5,17 +5,18 @@ import Tesseract from "../Tesseract/tesseract";
 export default class Visualizer extends React.Component {
     constructor(props){
         super(props);
+        let ts = new Tesseract();
     }
 
     componentDidMount() {
-        this.Tesseract = Tesseract.bind(this)
-        this.Tesseract()
+        this.ts = Tesseract.bind(this)
+        //this.ts()
     }
 
     render() {
         return(
             <div>
-            
+                <Tesseract/>
             </div>
         )
     }
