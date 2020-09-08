@@ -274,17 +274,21 @@ export default class Tesseract extends React.Component {
             else if(this.isEdit){
                 var index = this.intersects[0].faceIndex;
                 console.log("changing to::::", intersects[0]);
-                if(this.startOrEnd === 1 && this.intersects[0].object.geometry.faces[index].name !== this.END){
-                    var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
-                    this.removeStartingPoint(rPos.x, rPos.y, rPos.z, 4);
+                if(this.intersects[0].object.name != this.OBSTACLE){
+                    if(this.startOrEnd === 1 && this.intersects[0].object.geometry.faces[index].name !== this.END){
+                        var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
+                        this.removeStartingPoint(rPos.x, rPos.y, rPos.z, this.initialSFaceIndex);
+                        this.initialSFaceIndex = index;
                     var pos = this.intersects[0].object.position;
-                    this.createStartingPoint(pos.x, pos.y, pos.z, index);
-                }
-                else if(this.startOrEnd === 0 && this.intersects[0].object.geometry.faces[index].name !== this.START){
-                    var rPos = this.cubes[this.coordsToIndex(this.initialEndCoord)].position;
-                    this.removeEndingPoint(rPos.x, rPos.y, rPos.z, 4);
-                    var pos = this.intersects[0].object.position;
-                    this.createEndingPoint(pos.x, pos.y, pos.z, index);
+                    this.createStartingPoint(pos.x, pos.y, pos.z, this.initialSFaceIndex);
+                    }
+                    else if(this.startOrEnd === 0 && this.intersects[0].object.geometry.faces[index].name !== this.START){
+                        var rPos = this.cubes[this.coordsToIndex(this.initialEndCoord)].position;
+                        this.removeEndingPoint(rPos.x, rPos.y, rPos.z, this.initialEFaceIndex);
+                        this.initialEFaceIndex = index
+                        var pos = this.intersects[0].object.position;
+                        this.createEndingPoint(pos.x, pos.y, pos.z, this.initialEFaceIndex);
+                    }
                 }
                 document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
             }
@@ -382,7 +386,8 @@ export default class Tesseract extends React.Component {
 		    {
                 if (this.INTERSECTED) {
                     console.log("removing from inside",this.INTERSECTED.face.name);
-                    if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)){
+                    if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)
+                         && this.INTERSECTED.object.name != this.OBSTACLE){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
                         if(this.faceIndex % 2 === 0){
                             this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
@@ -402,7 +407,8 @@ export default class Tesseract extends React.Component {
                 this.INTERSECTED.currentColor = this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color;
                 console.log("intersect", this.INTERSECTED);
                 console.log("hover", this.intersects[0].object.geometry.faces[parseInt(this.faceIndex)].name);
-                if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END){
+                if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END
+                && this.INTERSECTED.object.name != this.OBSTACLE){
                     this.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
                 }
             }
@@ -410,7 +416,8 @@ export default class Tesseract extends React.Component {
         else {
             if (this.INTERSECTED) {
                 console.log("removing from outside");
-                if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)){
+                if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END
+                && this.INTERSECTED.object.name != this.OBSTACLE)){
                 this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
                     if(this.faceIndex%2 === 0){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
@@ -429,6 +436,7 @@ export default class Tesseract extends React.Component {
     
 
     setFaceColor(geometry, color, faceIndex){
+        console.log("setting face color for index", faceIndex);
         geometry.faces[faceIndex].color = color;
         if(faceIndex%2 === 0){
             geometry.faces[faceIndex+1].color = color;
