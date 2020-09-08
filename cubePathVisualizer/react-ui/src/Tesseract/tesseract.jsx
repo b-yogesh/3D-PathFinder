@@ -11,6 +11,8 @@ export default class Tesseract extends React.Component {
         this.animate = this.animate.bind(this);
         this.createEndingPoint = this.createEndingPoint.bind(this);
         this.createStartingPoint = this.createStartingPoint.bind(this);
+        this.removeEndingPoint = this.removeEndingPoint.bind(this);
+        this.removeStartingPoint = this.removeStartingPoint.bind(this);
         this.coordsToIndex = this.coordsToIndex.bind(this);
         this.toggle = this.toggle.bind(this);
         this.changeText = this.changeText.bind(this);
@@ -51,6 +53,21 @@ export default class Tesseract extends React.Component {
         var INTERSECTED;
         this.INTERSECTED = INTERSECTED;
 
+        var isEdit;
+        this.isEdit = isEdit;
+
+        var startOrEnd;
+        this.startOrEnd = startOrEnd;
+
+        var hoverStartColor;
+        this.hoverStartColor = hoverStartColor;
+
+        var hoverEndColor;
+        this.hoverEndColor = hoverEndColor;
+
+        var hoverUseColor;
+        this.hoverUseColor = hoverUseColor;
+
         var spotLight = new THREE.DirectionalLight( {color:0xffffff});
         spotLight.position.set( -1, 2, 3 );
         // scene.add( spotLight );
@@ -87,6 +104,9 @@ export default class Tesseract extends React.Component {
         floor.rotation.x = Math.PI / 2;
         // scene.add(floor);
         
+        var mazeColor = new THREE.Color(0xc2c2c2);
+        this.mazeColor = mazeColor;
+
         let cubeDims = 5
         this.cubeDims = cubeDims;
         for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
@@ -97,7 +117,7 @@ export default class Tesseract extends React.Component {
             this.cubes[cubeNum] = new THREE.Mesh(geometry, material);
             this.cubes[cubeNum].name = String(cubeNum);
             for(var i =0;i<12;i++){
-                this.cubes[cubeNum].geometry.faces[i].color = new THREE.Color(0xc2c2c2);
+                this.cubes[cubeNum].geometry.faces[i].color = mazeColor;
             }
             this.cubes[cubeNum].geometry.elementsNeedUpdate = true;
             // groupCubes.add(cubes[cubeNum]);
@@ -116,17 +136,21 @@ export default class Tesseract extends React.Component {
         this.cubePositions = cubePositions;
         let STARTING_POINT = 45
         let ENDING_POINT = 124
+        let initialStartCoord;
+        this.initialStartCoord = initialStartCoord;
+        var initialEndCoord;
+        this.initialEndCoord = initialEndCoord;
         for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
                     this.cubePositions.push([x, y, z]);
                     if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === ENDING_POINT)
                     {
-                        this.createEndingPoint(x,y,z);
+                        this.createEndingPoint(x,y,z,4);
                     }
                     if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === STARTING_POINT)
                     {
-                        this.createStartingPoint(x,y,z);
+                        this.createStartingPoint(x,y,z,4);
                     }
                 }
             }
@@ -166,7 +190,6 @@ export default class Tesseract extends React.Component {
         this.setState({ text: text },
         ()=>{
             console.log(this.state.text);
-            document.addEventListener( 'mousemove', this.onDocumentMouseMove, false );
         }); 
 
     }
@@ -224,13 +247,42 @@ export default class Tesseract extends React.Component {
             let offsetX, offsetY, offsetZ = 0;
             let geoX, geoY, geoZ = 0;
             
-            if( this.intersects[0].face.name === this.START){
+            if( this.intersects[0].face.name === this.START || this.intersects[0].face.name === this.END){
                 console.log("worked");
-                return;
+                if(this.isEdit){
+                    document.addEventListener( 'mousemove', this.onDocumentMouseMove, false );
+                    if(this.intersects[0].face.name === this.START){
+                        this.startOrEnd = 1;
+                        this.hoverStartColor = new THREE.Color(0xe84735);
+                        this.hoverUseColor = this.hoverStartColor;
+                    }
+                    else if(this.intersects[0].face.name === this.END){
+                        this.startOrEnd = 0;
+                        this.hoverEndColor = new THREE.Color(0x74d486);
+                        this.hoverUseColor = this.hoverEndColor;
+                    }
+                }
+                else{
+                    document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
+
+                }
             }
-            else if( this.intersects[0].face.name === this.END){
-                console.log("worked");
-                return;
+            else if(this.isEdit){
+                var index = this.intersects[0].faceIndex;
+                console.log("changing to::::", intersects[0]);
+                if(this.startOrEnd === 1 && this.intersects[0].object.geometry.faces[index].name !== this.END){
+                    var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
+                    this.removeStartingPoint(rPos.x, rPos.y, rPos.z, 4);
+                    var pos = this.intersects[0].object.position;
+                    this.createStartingPoint(pos.x, pos.y, pos.z, index);
+                }
+                else if(this.startOrEnd === 0 && this.intersects[0].object.geometry.faces[index].name !== this.START){
+                    var rPos = this.cubes[this.coordsToIndex(this.initialEndCoord)].position;
+                    this.removeEndingPoint(rPos.x, rPos.y, rPos.z, 4);
+                    var pos = this.intersects[0].object.position;
+                    this.createEndingPoint(pos.x, pos.y, pos.z, index);
+                }
+                document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
             }
             else if(this.intersects[0].object.name !== "obstacle"){
                 if(normal.x === 1){
@@ -325,34 +377,36 @@ export default class Tesseract extends React.Component {
             if (this.intersects[0] != this.INTERSECTED )//|| this.intersects[0].face ) 
 		    {
                 if (this.INTERSECTED) {
-                    console.log("removing from inside",this.mouse.x );
-                    this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
-                    if(this.faceIndex % 2 === 0){
-                        this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
+                    console.log("removing from inside",this.INTERSECTED.face.name);
+                    if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)){
+                        this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
+                        if(this.faceIndex % 2 === 0){
+                            this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
+                        }
+                        else{
+                            this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex-1)].color = this.INTERSECTED.currentColor;
+                        }
+                        this.INTERSECTED.object.geometry.colorsNeedUpdate = true;
+                        this.INTERSECTED.object.geometry.elementsNeedUpdate = true;
                     }
-                    else{
-                        this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex-1)].color = this.INTERSECTED.currentColor;
-                    }
-                    this.INTERSECTED.object.geometry.colorsNeedUpdate = true;
-                    this.INTERSECTED.object.geometry.elementsNeedUpdate = true;
                 }
                 
-                let faceIndex = this.intersects[0].faceIndex;
-                this.faceIndex = faceIndex;
                 
                 this.INTERSECTED = this.intersects[0];
+                let faceIndex = this.INTERSECTED.faceIndex;  
+                this.faceIndex = faceIndex;
                 this.INTERSECTED.currentColor = this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color;
                 console.log("intersect", this.INTERSECTED);
-                //console.log(this.intersects[0].object.geometry.faces[parseInt(this.faceIndex)].name);
+                console.log("hover", this.intersects[0].object.geometry.faces[parseInt(this.faceIndex)].name);
                 if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END){
-                    var color = new THREE.Color( 0x52ff6c );
-                    this.setFaceColor( color);
+                    this.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
                 }
             }
         } 
         else {
             if (this.INTERSECTED) {
                 console.log("removing from outside");
+                if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)){
                 this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
                     if(this.faceIndex%2 === 0){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
@@ -362,6 +416,7 @@ export default class Tesseract extends React.Component {
                     }
                     this.INTERSECTED.object.geometry.colorsNeedUpdate = true;
                     this.INTERSECTED.object.geometry.elementsNeedUpdate = true;
+                }
             }
             
             this.INTERSECTED = null;
@@ -369,16 +424,16 @@ export default class Tesseract extends React.Component {
     }
     
 
-    setFaceColor(color){
-        this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = color;
-        if(this.faceIndex%2 === 0){
-            this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = color;
+    setFaceColor(geometry, color, faceIndex){
+        geometry.faces[faceIndex].color = color;
+        if(faceIndex%2 === 0){
+            geometry.faces[faceIndex+1].color = color;
         }
         else{
-            this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex-1)].color = color;
+            geometry.faces[faceIndex-1].color = color;
         }
-        this.INTERSECTED.object.geometry.colorsNeedUpdate = true;
-        this.INTERSECTED.object.geometry.elementsNeedUpdate = true;
+        geometry.colorsNeedUpdate = true;
+        geometry.elementsNeedUpdate = true;
     }
 
 
@@ -386,32 +441,67 @@ export default class Tesseract extends React.Component {
         console.log("clicked....");
         if(this.controls.enabled === false){
             this.controls.enabled = true;
+            this.isEdit = false;
         }
         else{
             this.controls.enabled = false;
+            this.isEdit = true;
         }
     }
     
 
-    createStartingPoint(x,y,z){
+    createStartingPoint(x,y,z, faceIndex){
         console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         var color = new THREE.Color( 0xff0000 );
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4].color = color;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4+1].color = color; 
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.colorsNeedUpdate = true;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4].name = this.START;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4+1].name = this.START;
+        this.initialStartCoord = {x,y,z};
+        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.START;
+        if(this.faceIndex%2 === 0){
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.START;
+        }
+        else{
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = this.START;
+        }
+    }
+    
+    
+    createEndingPoint(x,y,z, faceIndex){
+        console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        this.initialEndCoord = {x,y,z};
+        var color = new THREE.Color( 0x04b31b );
+        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.END;
+        if(this.faceIndex%2 === 0){
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.END;
+        }
+        else{
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = this.STENDART;
+        }
+    }
+
+    removeStartingPoint(x,y,z, faceIndex){
+        console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
+        if(this.faceIndex%2 === 0){
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
+        }
+        else{
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = "";
+        }
     }
 
 
-    createEndingPoint(x,y,z){
-        console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
-        var color = new THREE.Color( 0xb87979 );
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4].color = color;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4+1].color = color;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.colorsNeedUpdate = true;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4].name = this.END;
-        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[4+1].name = this.END;
+    removeEndingPoint(x,y,z, faceIndex){
+        console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
+        if(this.faceIndex%2 === 0){
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
+        }
+        else{
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = "";
+        }
     }
     
 
