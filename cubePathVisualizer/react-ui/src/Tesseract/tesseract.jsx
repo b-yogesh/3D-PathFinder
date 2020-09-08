@@ -110,7 +110,7 @@ export default class Tesseract extends React.Component {
         let cubeDims = 5
         this.cubeDims = cubeDims;
         for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
-            let geometry = new THREE.BoxGeometry(0.99,0.99,0.99);
+            let geometry = new THREE.BoxGeometry(1,1,1);
             const material = new THREE.MeshLambertMaterial({
                 vertexColors: THREE.FaceColors 
                 });
@@ -140,17 +140,21 @@ export default class Tesseract extends React.Component {
         this.initialStartCoord = initialStartCoord;
         var initialEndCoord;
         this.initialEndCoord = initialEndCoord;
+        var initialSFaceIndex = 4;
+        this.initialSFaceIndex = initialSFaceIndex;
+        var initialEFaceIndex = 4;
+        this.initialEFaceIndex = initialEFaceIndex;
         for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
                     this.cubePositions.push([x, y, z]);
                     if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === ENDING_POINT)
                     {
-                        this.createEndingPoint(x,y,z,4);
+                        this.createEndingPoint(x,y,z,this.initialEFaceIndex);
                     }
                     if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === STARTING_POINT)
                     {
-                        this.createStartingPoint(x,y,z,4);
+                        this.createStartingPoint(x,y,z,this.initialSFaceIndex);
                     }
                 }
             }
@@ -456,7 +460,7 @@ export default class Tesseract extends React.Component {
         this.initialStartCoord = {x,y,z};
         this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.START;
-        if(this.faceIndex%2 === 0){
+        if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.START;
         }
         else{
@@ -471,11 +475,11 @@ export default class Tesseract extends React.Component {
         var color = new THREE.Color( 0x04b31b );
         this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.END;
-        if(this.faceIndex%2 === 0){
+        if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.END;
         }
         else{
-            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = this.STENDART;
+            this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = this.END;
         }
     }
 
@@ -483,7 +487,7 @@ export default class Tesseract extends React.Component {
         console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
-        if(this.faceIndex%2 === 0){
+        if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
         }
         else{
@@ -496,7 +500,7 @@ export default class Tesseract extends React.Component {
         console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
-        if(this.faceIndex%2 === 0){
+        if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
         }
         else{
