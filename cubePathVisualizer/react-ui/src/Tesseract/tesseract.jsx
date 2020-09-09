@@ -4,6 +4,13 @@ import './tesseract.css';
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
 import * as TWEEN from "tween";
+import * as setFaceColor from "../Helpers/helper.js"
+import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
+import BFS from "../Algorithms/BFS";
+
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 export default class Tesseract extends React.Component {
     constructor(props) {
@@ -18,7 +25,7 @@ export default class Tesseract extends React.Component {
         this.changeText = this.changeText.bind(this);
         this.onDocumentMouseMove = this.onDocumentMouseMove.bind(this);
         this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
-        this.setFaceColor = this.setFaceColor.bind(this);
+        this.checkHowManyFaces = this.checkHowManyFaces.bind(this);
         this.state = { text: "Click to Edit"};
     }
     
@@ -248,10 +255,9 @@ export default class Tesseract extends React.Component {
         this.ray.setFromCamera( this.mouse, this.camera );
         var intersects = this.ray.intersectObjects( this.scene.children, true );
         this.intersects = intersects;
-        console.log(this.intersects);
+        //console.log(this.intersects);
         if(this.intersects.length > 0){
             console.log(this.intersects[0]);
-            console.log(this.intersects[0].object.position);
             var intersectIndex = -1;
             for(var i=0;i<this.intersects.length;i++){
                 if(this.intersects[i].object.type === "Mesh"){
@@ -260,13 +266,16 @@ export default class Tesseract extends React.Component {
                 }
             }
             if(intersectIndex === -1) return
+            //console.log(this.intersects[intersectIndex]);
+            console.log(this.intersects[intersectIndex].object.position);
+            console.log("vertex",this.intersects[intersectIndex].face.vertex);
             // console.log("name:::", this.intersects[intersectIndex].face.name);
             // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
             let faceIndex = this.intersects[intersectIndex].faceIndex;
             let position = new THREE.Vector3();
             position = this.intersects[intersectIndex].object.position;
             let ind = this.coordsToIndex(position);
-            console.log("ind...", ind);
+            // console.log("ind...", ind);
             let normal = new THREE.Vector3();
             normal = this.intersects[intersectIndex].face.normal;
 
@@ -438,7 +447,7 @@ export default class Tesseract extends React.Component {
                 console.log("hover", this.intersects[intersectIndex].object.geometry.faces[parseInt(this.faceIndex)].name);
                 if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END
                 && this.INTERSECTED.object.name != this.OBSTACLE){
-                    this.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
+                    setFaceColor.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
                 }
             }
         } 
@@ -464,19 +473,6 @@ export default class Tesseract extends React.Component {
     }
     
 
-    setFaceColor(geometry, color, faceIndex){
-        console.log("setting face color for index", faceIndex);
-        geometry.faces[faceIndex].color = color;
-        if(faceIndex%2 === 0){
-            geometry.faces[faceIndex+1].color = color;
-        }
-        else{
-            geometry.faces[faceIndex-1].color = color;
-        }
-        geometry.colorsNeedUpdate = true;
-        geometry.elementsNeedUpdate = true;
-    }
-
 
     toggle(){
         console.log("clicked....");
@@ -495,7 +491,7 @@ export default class Tesseract extends React.Component {
         console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         var color = new THREE.Color( 0xff0000 );
         this.initialStartCoord = {x,y,z};
-        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.START;
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.START;
@@ -510,7 +506,7 @@ export default class Tesseract extends React.Component {
         console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.initialEndCoord = {x,y,z};
         var color = new THREE.Color( 0x04b31b );
-        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.END;
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.END;
@@ -522,7 +518,7 @@ export default class Tesseract extends React.Component {
 
     removeStartingPoint(x,y,z, faceIndex){
         console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
-        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
@@ -535,7 +531,7 @@ export default class Tesseract extends React.Component {
 
     removeEndingPoint(x,y,z, faceIndex){
         console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
-        this.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
@@ -544,13 +540,61 @@ export default class Tesseract extends React.Component {
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex-1].name = "";
         }
     }
+
+
+    getVertices(){
+        let vertex = 0;
+        let vertices = {};
+        for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
+            for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
+                for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
+                    var noOfFaces = this.checkHowManyFaces(x,y,z);
+                    if(noOfFaces!=0){
+                        var index = this.coordsToIndex(new THREE.Vector3(x,y,z));
+                        var map = cubesToFaces[index];
+                        for(var i = 0; i < noOfFaces; i++){
+                            //console.log(map[i]);
+                            //console.log(vertex,x,y,z);
+                            this.cubes[index].geometry.faces[map[i]].vertex = vertex;
+                            this.cubes[index].geometry.faces[map[i]+1].vertex = vertex;
+                            
+                            vertices[vertex] = [index, map[i]];
+                            vertex += 1;
+                        } 
+                    }
+                }
+            }
+        }
+        console.log(vertices);
+        //createGraph(vertices);
+    }
+
+    createGraph(vertices){
+        var graph = BFS.graph(vertices);
+        console.log(graph);
+    }
+
+    checkHowManyFaces(x,y,z){
+        let faces = 0;
+        if(x===this.cubeIndex || x===-this.cubeIndex){
+            faces += 1;
+        }
+        if(y===this.cubeIndex || y === -this.cubeIndex){
+            faces += 1;
+        }
+        if(z===this.cubeIndex || z === -this.cubeIndex){
+            faces += 1;
+        }
+        return faces;
+    }
     
 
     render() {
         const { text } = this.state
         return (
             <div ref={(mount) => { this.mount = mount }}>
-                <button onClick={this.changeText}>{text}</button>
+                <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
+                <Button id="visualize" variant="success" onClick={this.getVertices.bind(this)}>Start Visualization</Button>
             </div>
         );
         }
