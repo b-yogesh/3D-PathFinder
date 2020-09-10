@@ -4,7 +4,7 @@ import './tesseract.css';
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
 import * as TWEEN from "tween";
-import * as setFaceColor from "../Helpers/helper.js"
+import * as helper from "../Helpers/helper.js"
 import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
 import edgesMapping from "../Mappings/edgesMapping";
 import BFS from "../Algorithms/BFS";
@@ -148,7 +148,6 @@ export default class Tesseract extends React.Component {
         this.start_index = start_index
         this.start_index = {x:Math.floor(cubeDims / 2),y:-Math.floor(cubeDims / 2),z:Math.floor(cubeDims / 2)};
         console.log("satrindex", this.start_index);
-            
         let cubeIndex = parseInt(cubeDims / 2)
         this.cubeIndex = cubeIndex;
         console.log("cubeindex>:::", cubeIndex);
@@ -449,7 +448,7 @@ export default class Tesseract extends React.Component {
                 console.log("hover", this.intersects[intersectIndex].object.geometry.faces[parseInt(this.faceIndex)].name);
                 if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END
                 && this.INTERSECTED.object.name != this.OBSTACLE){
-                    setFaceColor.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
+                    helper.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
                 }
             }
         } 
@@ -493,7 +492,7 @@ export default class Tesseract extends React.Component {
         console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         var color = new THREE.Color( 0xff0000 );
         this.initialStartCoord = {x,y,z};
-        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.START;
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.START;
@@ -508,7 +507,7 @@ export default class Tesseract extends React.Component {
         console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.initialEndCoord = {x,y,z};
         var color = new THREE.Color( 0x04b31b );
-        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
+        helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = this.END;
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = this.END;
@@ -520,7 +519,7 @@ export default class Tesseract extends React.Component {
 
     removeStartingPoint(x,y,z, faceIndex){
         console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
-        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
@@ -533,7 +532,7 @@ export default class Tesseract extends React.Component {
 
     removeEndingPoint(x,y,z, faceIndex){
         console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
-        setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
+        helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
             this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex+1].name = "";
@@ -585,14 +584,14 @@ export default class Tesseract extends React.Component {
             }
         }
         graph.printGraph();
-        var path = graph.bfs("0");
+        var path = graph.bfs("59",this.cubes,vertices);
         console.log("path is...", path);
-        for (var i = 0; i < path.length; i++) {
-            var v = path[i];
-            console.log(vertices[v]);
-            setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(vertices[v][0], vertices[v][1], vertices[v][2]))].geometry,
-                        new THREE.Color(0x324342), vertices[v][4]);
-        }
+        // for (var i = 0; i < path.length; i++) {
+        //     var v = path[i];
+        //     console.log(vertices[v]);
+        //     helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(vertices[v][0], vertices[v][1], vertices[v][2]))].geometry,
+        //                 new THREE.Color(0x88ebe5), vertices[v][4]);
+        // }
     }
 
     checkHowManyFaces(x,y,z){
