@@ -6,6 +6,7 @@ import * as OrbitControls from "three-orbitcontrols";
 import * as TWEEN from "tween";
 import * as setFaceColor from "../Helpers/helper.js"
 import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
+import edgesMapping from "../Mappings/edgesMapping";
 import BFS from "../Algorithms/BFS";
 
 import Button from 'react-bootstrap/Button';
@@ -26,6 +27,7 @@ export default class Tesseract extends React.Component {
         this.onDocumentMouseMove = this.onDocumentMouseMove.bind(this);
         this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
         this.checkHowManyFaces = this.checkHowManyFaces.bind(this);
+        this.createGraph = this.createGraph.bind(this);
         this.state = { text: "Click to Edit"};
     }
     
@@ -558,20 +560,39 @@ export default class Tesseract extends React.Component {
                             this.cubes[index].geometry.faces[map[i]].vertex = vertex;
                             this.cubes[index].geometry.faces[map[i]+1].vertex = vertex;
                             
-                            vertices[vertex] = [index, map[i]];
+                            vertices[vertex] = [x,y,z,index, map[i]];
                             vertex += 1;
                         } 
                     }
                 }
             }
         }
-        console.log(vertices);
-        //createGraph(vertices);
+        
+        this.createGraph(vertices);
+
     }
 
     createGraph(vertices){
-        var graph = BFS.graph(vertices);
-        console.log(graph);
+        var length = Object.keys(vertices).length;
+        var graph = new BFS(length);
+        for(var key in vertices){
+            graph.addVertex(key);
+        }
+        for(var edge in edgesMapping){
+            var e = edgesMapping[edge];
+            for(var i = 0; i<4; i++){
+                graph.addEdge(edge, e[i]);
+            }
+        }
+        graph.printGraph();
+        var path = graph.bfs("0");
+        console.log("path is...", path);
+        for (var i = 0; i < path.length; i++) {
+            var v = path[i];
+            console.log(vertices[v]);
+            setFaceColor.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(vertices[v][0], vertices[v][1], vertices[v][2]))].geometry,
+                        new THREE.Color(0x324342), vertices[v][4]);
+        }
     }
 
     checkHowManyFaces(x,y,z){
