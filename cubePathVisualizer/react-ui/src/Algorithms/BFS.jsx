@@ -56,14 +56,14 @@ export default class BFS extends React.Component  {
                 } 
         }
       
-        bfs(startingNode, cubes, vertices){
+        bfs(startingNode, target){
             var visited = []; 
             const INF = 1000000;
+            let visitedNodesInOrder = [];
             var distances = Array(this.noOfVertices).fill(INF);
-            // console.log(this.noOfVertices,distances);
+            console.log(startingNode, target);
             distances[startingNode] = 0;
             var pred = []; 
-            let target = 148;
              for (var i = 0; i < this.noOfVertices; i++)
              { 
                  visited[i] = false;
@@ -75,46 +75,41 @@ export default class BFS extends React.Component  {
             var q = new Queue(); 
             q.enqueue(startingNode); 
             var path = [];
-            path.push(target);
-            let count = 0;
+            //path.push(target);
             while (!q.isEmpty()) { 
                 var getQueueElement = q.dequeue(); 
-                // console.log(getQueueElement); 
-                var get_List = this.AdjList.get(getQueueElement); 
-                //console.log("Getlist", get_List);
-                // const d = distances[getQueueElement] + 1;
+                 console.log(getQueueElement); 
+                var get_List = this.AdjList.get(String(getQueueElement)); 
+                 console.log("Getlist", get_List, q, this.AdjList,  this.AdjList.get(String(getQueueElement)));
                 for (var i in get_List) {
-                    // var traverse = function(){
-                        setTimeout(function(i) {
+                        console.log("i...",i,get_List);
                         var neigh = get_List[i]; 
                         if (!visited[neigh]) { 
                             visited[neigh] = true; 
-                            count+=1;
-                            helper.setFaceColor(cubes[helper.coordsToIndex(new THREE.Vector3(vertices[neigh][0], 
-                                vertices[neigh][1], vertices[neigh][2]))].geometry,
-                                new THREE.Color(0xffff47), vertices[neigh][4])}
-                                if (distances[neigh] === INF) {
-                                    distances[neigh] = distances[getQueueElement] + 1;
-                                    pred[neigh] = getQueueElement;
-                                    q.enqueue(neigh);
-                                    console.log(neigh,vertices[neigh] );
-                                    if(parseInt(neigh) === parseInt(target)){
-                                        console.log(pred);
-                                        
-                                        while (pred[target] != -1) { 
-                                            path.push(pred[target]); 
-                                            target = pred[target]; 
-                                        }
-                                        
-                                        console.log(path);
-                                        return path;
-                                    }
-                                } 
+                            visitedNodesInOrder.push(neigh);
+                            if (distances[neigh] === INF) {
+                                distances[neigh] = distances[getQueueElement] + 1;
+                                pred[neigh] = getQueueElement;
+                                q.enqueue(neigh);
+                                // console.log(neigh,vertices[neigh] );
+                                if(parseInt(neigh) === parseInt(target)){
+                                    console.log(pred);
+                                    
+                                    while (pred[target] != -1) {
 
-                            },count*10);
+                                        path.push(pred[target]); 
+                                        target = pred[target]; 
+                                    }
+                                    
+                                    // console.log(path);
+                                    console.log(visitedNodesInOrder);
+                                    return [visitedNodesInOrder, path];
+                                }
+                            } 
                             } 
                     } 
-                // }
-    }
+                }
+                return visitedNodesInOrder
 
+    }
 }

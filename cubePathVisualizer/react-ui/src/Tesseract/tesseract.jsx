@@ -28,6 +28,9 @@ export default class Tesseract extends React.Component {
         this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
         this.checkHowManyFaces = this.checkHowManyFaces.bind(this);
         this.createGraph = this.createGraph.bind(this);
+        this.animateVisitedNodes = this.animateVisitedNodes.bind(this);
+        this.animateShortestpath = this.animateShortestpath.bind(this);
+        this.getVertices = this.getVertices.bind(this);
         this.state = { text: "Click to Edit"};
     }
     
@@ -114,7 +117,8 @@ export default class Tesseract extends React.Component {
         floor.position.y = -2.5;
         floor.rotation.x = Math.PI / 2;
         // scene.add(floor);
-        
+        let delay;
+        this.delay = delay;
         var mazeColor = new THREE.Color(0xc2c2c2);
         this.mazeColor = mazeColor;
 
@@ -203,7 +207,9 @@ export default class Tesseract extends React.Component {
         var vector = new THREE.Vector3( this.mouse.x, this.mouse.y, 1 );
         var ray = new THREE.Raycaster( this.camera.position, vector.sub( this.camera.position ).normalize() );
         this.ray = ray;
-
+        this.getVertices();
+        this.source = 59;
+        this.target = 148; 
         
           
     }
@@ -490,6 +496,7 @@ export default class Tesseract extends React.Component {
 
     createStartingPoint(x,y,z, faceIndex){
         console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        this.source = this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].vertex;
         var color = new THREE.Color( 0xff0000 );
         this.initialStartCoord = {x,y,z};
         helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
@@ -505,6 +512,7 @@ export default class Tesseract extends React.Component {
     
     createEndingPoint(x,y,z, faceIndex){
         console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        this.target = this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].vertex;
         this.initialEndCoord = {x,y,z};
         var color = new THREE.Color( 0x04b31b );
         helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, color, faceIndex);
@@ -566,15 +574,14 @@ export default class Tesseract extends React.Component {
                 }
             }
         }
-        
-        this.createGraph(vertices);
-
+        this.vertices = vertices;
     }
 
-    createGraph(vertices){
-        var length = Object.keys(vertices).length;
+    createGraph(){
+        var length = Object.keys(this.vertices).length;
         var graph = new BFS(length);
-        for(var key in vertices){
+        console.log(this.vertices);
+        for(var key in this.vertices){
             graph.addVertex(key);
         }
         for(var edge in edgesMapping){
@@ -584,14 +591,39 @@ export default class Tesseract extends React.Component {
             }
         }
         graph.printGraph();
-        var path = graph.bfs("59",this.cubes,vertices);
+        let values = graph.bfs(this.source, this.target);
+        let visitedNodesInOrder = values[0];
+        let path = values[1];
         console.log("path is...", path);
-        // for (var i = 0; i < path.length; i++) {
-        //     var v = path[i];
-        //     console.log(vertices[v]);
-        //     helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(vertices[v][0], vertices[v][1], vertices[v][2]))].geometry,
-        //                 new THREE.Color(0x88ebe5), vertices[v][4]);
-        // }
+        console.log("nodes...", visitedNodesInOrder);
+        this.delay = 50;
+        this.animateVisitedNodes(visitedNodesInOrder, path);
+    }
+
+    animateVisitedNodes(nodes, path){
+        for(let i = 0 ; i<= nodes.length-1; i++){
+            if(i === nodes.length-1){
+                setTimeout(()=>{
+                    this.animateShortestpath(path.reverse());
+                },this.delay*i);
+                return;
+            }
+            setTimeout(()=>{
+                let v = nodes[i];
+                helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(this.vertices[v][0], this.vertices[v][1], this.vertices[v][2]))].geometry,
+                         new THREE.Color(0x88ebe5), this.vertices[v][4]);
+            },this.delay*i);
+        } 
+    }
+
+    animateShortestpath(nodes){
+        for(let i = 1 ; i< nodes.length; i++){
+            setTimeout(()=>{
+                let v = nodes[i];
+                helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(this.vertices[v][0], this.vertices[v][1], this.vertices[v][2]))].geometry,
+                         new THREE.Color(0x7532a8), this.vertices[v][4]);
+            },this.delay*i);
+        }
     }
 
     checkHowManyFaces(x,y,z){
@@ -614,7 +646,7 @@ export default class Tesseract extends React.Component {
         return (
             <div ref={(mount) => { this.mount = mount }}>
                 <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
-                <Button id="visualize" variant="success" onClick={this.getVertices.bind(this)}>Start Visualization</Button>
+                <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
             </div>
         );
         }
