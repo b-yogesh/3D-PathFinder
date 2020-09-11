@@ -133,6 +133,7 @@ export default class Tesseract extends React.Component {
             this.cubes[cubeNum].name = String(cubeNum);
             for(var i =0;i<12;i++){
                 this.cubes[cubeNum].geometry.faces[i].color = mazeColor;
+                this.cubes[cubeNum].geometry.faces[i].isAWall = false;
             }
             this.cubes[cubeNum].geometry.elementsNeedUpdate = true;
 
@@ -274,7 +275,7 @@ export default class Tesseract extends React.Component {
             }
             if(intersectIndex === -1) return
             //console.log(this.intersects[intersectIndex]);
-            console.log(this.intersects[intersectIndex].object.position);
+            console.log(this.intersects[intersectIndex]);
             console.log("vertex",this.intersects[intersectIndex].face.vertex);
             // console.log("name:::", this.intersects[intersectIndex].face.name);
             // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
@@ -388,6 +389,7 @@ export default class Tesseract extends React.Component {
                 let obstacle = new THREE.Mesh(geometry, material);
                 obstacle.position.set(position.x + offsetX, position.y + offsetY, position.z + offsetZ);
                 obstacle.name = this.OBSTACLE;
+                // obstacle.vertex = this.vertices[];
                 // groupCubes.add(cubes[cubeNum]);
                 obstacle.castShadow = true;
                 obstacle.receiveShadow = true;
@@ -397,9 +399,18 @@ export default class Tesseract extends React.Component {
                                 .to({ y: 10}, 2000)
                                 .easing(TWEEN.Easing.Bounce.Out)
                                 .start();
+                this.intersects[intersectIndex].object.geometry.faces[faceIndex].isAWall = true;
+                if(faceIndex%2===0){
+                    this.intersects[intersectIndex].object.geometry.faces[faceIndex+1].isAWall = true;
                 }
                 else{
+                    this.intersects[intersectIndex].object.geometry.faces[faceIndex-1].isAWall = true;
+                }
+                }        
+                else{
                     console.log("remving obstacle", this.intersects[intersectIndex].object.uuid);
+                    let p = this.intersects[intersectIndex].object.position;
+
                     let uuid = this.intersects[intersectIndex].object.uuid;
                     const object = this.scene.getObjectByProperty( 'uuid', uuid );
                     console.log(object);
@@ -584,12 +595,31 @@ export default class Tesseract extends React.Component {
         for(var key in this.vertices){
             graph.addVertex(key);
         }
+        let wallNodes = [];
         for(var edge in edgesMapping){
             var e = edgesMapping[edge];
-            for(var i = 0; i<4; i++){
-                graph.addEdge(edge, e[i]);
+            let index = this.vertices[edge][3];
+            if(this.cubes[index].geometry.faces[this.vertices[edge][4]].isAWall === true){
+                wallNodes.push(parseInt(edge));
             }
+            
         }
+        console.log("walls", wallNodes);
+        for(var edge in edgesMapping){
+            var e = edgesMapping[edge];
+            let index = this.vertices[edge][3];
+            if(this.cubes[index].geometry.faces[this.vertices[edge][4]].isAWall === true){
+               continue;
+            }
+            for(var i = 0; i<4; i++){
+                if(!wallNodes.includes(e[i]))
+                {
+                    graph.addEdge(edge, e[i]);
+                }
+            }
+            
+        }
+            
         graph.printGraph();
         let values = graph.bfs(this.source, this.target);
         let visitedNodesInOrder = values[0];
