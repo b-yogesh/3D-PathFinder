@@ -161,6 +161,8 @@ export default class Tesseract extends React.Component {
         this.cubePositions = cubePositions;
         let STARTING_POINT = 45
         let ENDING_POINT = 124
+        this.STARTING_POINT = STARTING_POINT
+        this.ENDING_POINT = ENDING_POINT
         let initialStartCoord;
         this.initialStartCoord = initialStartCoord;
         var initialEndCoord;
@@ -173,11 +175,11 @@ export default class Tesseract extends React.Component {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
                     this.cubePositions.push([x, y, z]);
-                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === ENDING_POINT)
+                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === this.ENDING_POINT)
                     {
                         this.createEndingPoint(x,y,z,this.initialEFaceIndex);
                     }
-                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === STARTING_POINT)
+                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === this.STARTING_POINT)
                     {
                         this.createStartingPoint(x,y,z,this.initialSFaceIndex);
                     }
@@ -320,14 +322,16 @@ export default class Tesseract extends React.Component {
                         var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
                         this.removeStartingPoint(rPos.x, rPos.y, rPos.z, this.initialSFaceIndex);
                         this.initialSFaceIndex = index;
-                    var pos = this.intersects[intersectIndex].object.position;
-                    this.createStartingPoint(pos.x, pos.y, pos.z, this.initialSFaceIndex);
+                        var pos = this.intersects[intersectIndex].object.position;
+                        this.STARTING_POINT = this.coordsToIndex(new THREE.Vector3(pos.x, pos.y, pos.z))
+                        this.createStartingPoint(pos.x, pos.y, pos.z, this.initialSFaceIndex);
                     }
                     else if(this.startOrEnd === 0 && this.intersects[intersectIndex].object.geometry.faces[index].name !== this.START){
                         var rPos = this.cubes[this.coordsToIndex(this.initialEndCoord)].position;
                         this.removeEndingPoint(rPos.x, rPos.y, rPos.z, this.initialEFaceIndex);
                         this.initialEFaceIndex = index
                         var pos = this.intersects[intersectIndex].object.position;
+                        this.ENDING_POINT = this.coordsToIndex(new THREE.Vector3(pos.x, pos.y, pos.z))
                         this.createEndingPoint(pos.x, pos.y, pos.z, this.initialEFaceIndex);
                     }
                 }
@@ -649,7 +653,7 @@ export default class Tesseract extends React.Component {
         let path = values[1];
         console.log("path is...", path);
         console.log("nodes...", visitedNodesInOrder);
-        this.delay = 100;
+        this.delay = 10;
         this.animateVisitedNodes(visitedNodesInOrder, path);
     }
 
@@ -713,8 +717,8 @@ export default class Tesseract extends React.Component {
 
 
     clearWalls(){
-        for(var i = 0 ; i< this.vertices.length; i++){
-            this.cubes[this.vertices[i][3]].geometry.faces[this.vertices[i][4]].isAWall = false;
+        for(let v in this.vertices){
+            this.cubes[this.vertices[v][3]].geometry.faces[this.vertices[v][4]].isAWall = false;
         }
         let obstacles = []
         this.scene.traverse((node) => {
@@ -735,17 +739,35 @@ export default class Tesseract extends React.Component {
 
 
     clearPath(){
-
+        for(let v in this.vertices){
+            helper.setFaceColor(this.cubes[this.vertices[v][3]].geometry, this.mazeColor, this.vertices[v][4]);
+        }
+        for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
+            for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
+                for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
+                    this.cubePositions.push([x, y, z]);
+                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === this.ENDING_POINT)
+                    {
+                        this.createEndingPoint(x,y,z,this.initialEFaceIndex);
+                    }
+                    if((this.coordsToIndex(new THREE.Vector3(x,y,z))) === this.STARTING_POINT)
+                    {
+                        this.createStartingPoint(x,y,z,this.initialSFaceIndex);
+                    }
+                }
+            }
+        }
     }
     
 
     render() {
         const { text } = this.state
         return (
-            <div ref={(mount) => { this.mount = mount }}>
+            <div className="cont" ref={(mount) => { this.mount = mount }}>
                 <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
                 <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
                 <Button id="clearWalls" variant="primary" onClick={this.clearWalls}>Clear Walls</Button>
+                <Button id="clearPath" variant="primary" onClick={this.clearPath}>Clear Path</Button>
             </div>
         );
         }

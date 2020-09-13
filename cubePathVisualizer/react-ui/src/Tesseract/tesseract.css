@@ -1,8 +1,17 @@
 Button {
     position: absolute;
     align-items: center;
+    margin:2%;
   }
 
 #visualize{
-    left:35%;
+    top: 10%;
+}
+
+#clearWalls{
+  top: 20%;
+}
+
+#clearPath{
+  top: 30%;
 }
