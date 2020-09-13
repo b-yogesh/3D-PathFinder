@@ -26,8 +26,13 @@ export default class Tesseract extends React.Component {
         this.changeText = this.changeText.bind(this);
         this.onDocumentMouseMove = this.onDocumentMouseMove.bind(this);
         this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
+        this.onWindowResize = this.onWindowResize.bind(this);
         this.checkHowManyFaces = this.checkHowManyFaces.bind(this);
         this.createGraph = this.createGraph.bind(this);
+        this.clearWalls = this.clearWalls.bind(this);
+        this.createObstacle = this.createObstacle.bind(this);
+        this.removeObstacle = this.removeObstacle.bind(this);
+        this.clearPath = this.clearPath.bind(this);
         this.animateVisitedNodes = this.animateVisitedNodes.bind(this);
         this.animateShortestpath = this.animateShortestpath.bind(this);
         this.getVertices = this.getVertices.bind(this);
@@ -112,12 +117,7 @@ export default class Tesseract extends React.Component {
         this.cubes = cubes;
         const edges = {};
         this.edges = edges;
-        var floorMaterial = new THREE.MeshBasicMaterial({side: THREE.DoubleSide ,color:0xaf006f});
-        var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
-        var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.position.y = -2.5;
-        floor.rotation.x = Math.PI / 2;
-        // scene.add(floor);
+       
         let delay;
         this.delay = delay;
         var mazeColor = new THREE.Color(0xc2c2c2);
@@ -202,6 +202,7 @@ export default class Tesseract extends React.Component {
         this.camera.position.x = 8;
         this.controls.update();
         document.addEventListener( 'mousedown', this.onDocumentMouseDown, false );
+        window.addEventListener("resize", this.onWindowResize, false);
         var mouse = new THREE.Vector2();
         this.mouse = mouse;
         //this.animate = animate;
@@ -381,51 +382,11 @@ export default class Tesseract extends React.Component {
                     geoX= 0.95; 
                     geoY = 0.95;
                 }
-                console.log("creating obstacle");
-                let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
-                const material = new THREE.MeshPhongMaterial({
-                    color: 0x00f00f,
-                    vertexColors: THREE.FaceColors 
-                });
-                let obstacle = new THREE.Mesh(geometry, material);
-                obstacle.position.set(position.x + offsetX, position.y + offsetY, position.z + offsetZ);
-                obstacle.name = this.OBSTACLE;
-                // obstacle.vertex = this.vertices[];
-                // groupCubes.add(cubes[cubeNum]);
-                obstacle.castShadow = true;
-                obstacle.receiveShadow = true;
-                this.scene.add(obstacle); 
-                obstacle.position.setY = 25;
-                new TWEEN.Tween(obstacle.position)
-                                .to({ y: 10}, 2000)
-                                .easing(TWEEN.Easing.Bounce.Out)
-                                .start();
-                this.intersects[intersectIndex].object.geometry.faces[faceIndex].isAWall = true;
-                let pos = this.intersects[intersectIndex].object.position;
-                let vertexIndex = this.faceIndexAndCubeIndexToVertex(faceIndex, this.coordsToIndex(new THREE.Vector3(pos.x,pos.y,pos.z)));
-                obstacle.vertexIndex = vertexIndex;
-                if(faceIndex%2===0){
-                    this.intersects[intersectIndex].object.geometry.faces[faceIndex+1].isAWall = true;
-                }
-                else{
-                    this.intersects[intersectIndex].object.geometry.faces[faceIndex-1].isAWall = true;
-                }
-                }        
-                else{
-                    console.log("remving obstacle", this.intersects[intersectIndex].object.uuid);
-                    let p = this.intersects[intersectIndex].object.position;
-                    let vertexIndex = this.intersects[intersectIndex].object.vertexIndex;
-                    console.log("vertexIndex...", vertexIndex);
-                    this.cubes[this.vertices[vertexIndex][3]].geometry.faces[this.vertices[vertexIndex][4]].isAWall = false;
-                    
-                    let uuid = this.intersects[intersectIndex].object.uuid;
-                    const object = this.scene.getObjectByProperty( 'uuid', uuid );
-                    console.log(object);
-                    object.geometry.dispose();
-                    object.material.dispose();
-                    this.scene.remove( object );
-                    
-                }
+                    this.createObstacle(geoX,geoY,geoZ,offsetX,offsetY,offsetZ,intersectIndex,faceIndex);
+            }        
+            else{
+                this.removeObstacle(intersectIndex);
+            }
         }
     }
 
@@ -496,7 +457,13 @@ export default class Tesseract extends React.Component {
             this.INTERSECTED = null;
             }
     }
-    
+
+
+    onWindowResize(){
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }    
 
 
     toggle(){
@@ -569,6 +536,55 @@ export default class Tesseract extends React.Component {
     }
 
 
+    createObstacle(geoX,geoY,geoZ,offsetX,offsetY,offsetZ,intersectIndex,faceIndex){
+        console.log("creating obstacle");
+        let pos = this.intersects[intersectIndex].object.position;
+        let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x00f00f,
+            vertexColors: THREE.FaceColors 
+        });
+        let obstacle = new THREE.Mesh(geometry, material);
+        obstacle.position.set(pos.x + offsetX, pos.y + offsetY, pos.z + offsetZ);
+        obstacle.name = this.OBSTACLE;
+        // obstacle.vertex = this.vertices[];
+        // groupCubes.add(cubes[cubeNum]);
+        obstacle.castShadow = true;
+        obstacle.receiveShadow = true;
+        this.scene.add(obstacle); 
+        obstacle.position.setY = 25;
+        new TWEEN.Tween(obstacle.position)
+                        .to({ y: 10}, 2000)
+                        .easing(TWEEN.Easing.Bounce.Out)
+                        .start();
+        this.intersects[intersectIndex].object.geometry.faces[faceIndex].isAWall = true;
+        let vertexIndex = this.faceIndexAndCubeIndexToVertex(faceIndex, this.coordsToIndex(new THREE.Vector3(pos.x,pos.y,pos.z)));
+        obstacle.vertexIndex = vertexIndex;
+        if(faceIndex%2===0){
+            this.intersects[intersectIndex].object.geometry.faces[faceIndex+1].isAWall = true;
+        }
+        else{
+            this.intersects[intersectIndex].object.geometry.faces[faceIndex-1].isAWall = true;
+        }
+    }
+
+
+    removeObstacle(intersectIndex){
+        console.log("remving obstacle", this.intersects[intersectIndex].object.uuid);
+        let p = this.intersects[intersectIndex].object.position;
+        let vertexIndex = this.intersects[intersectIndex].object.vertexIndex;
+        console.log("vertexIndex...", vertexIndex);
+        this.cubes[this.vertices[vertexIndex][3]].geometry.faces[this.vertices[vertexIndex][4]].isAWall = false;
+
+        let uuid = this.intersects[intersectIndex].object.uuid;
+        const object = this.scene.getObjectByProperty( 'uuid', uuid );
+        console.log(object);
+        object.geometry.dispose();
+        object.material.dispose();
+        this.scene.remove( object );
+    }
+
+
     getVertices(){
         let vertex = 0;
         let vertices = {};
@@ -633,7 +649,7 @@ export default class Tesseract extends React.Component {
         let path = values[1];
         console.log("path is...", path);
         console.log("nodes...", visitedNodesInOrder);
-        this.delay = 50;
+        this.delay = 100;
         this.animateVisitedNodes(visitedNodesInOrder, path);
     }
 
@@ -694,6 +710,33 @@ export default class Tesseract extends React.Component {
         }
         return -1;
     }
+
+
+    clearWalls(){
+        for(var i = 0 ; i< this.vertices.length; i++){
+            this.cubes[this.vertices[i][3]].geometry.faces[this.vertices[i][4]].isAWall = false;
+        }
+        let obstacles = []
+        this.scene.traverse((node) => {
+            if(node instanceof THREE.Mesh){
+                if(node.name === this.OBSTACLE){
+                    obstacles.push(node);
+                }
+            }
+        });
+        for(var i =0; i < obstacles.length; i++){
+            let uuid = obstacles[i].uuid;
+            const object = this.scene.getObjectByProperty( 'uuid', uuid );
+            object.geometry.dispose();
+            object.material.dispose();
+            this.scene.remove( object );
+        }
+    }
+
+
+    clearPath(){
+
+    }
     
 
     render() {
@@ -702,6 +745,7 @@ export default class Tesseract extends React.Component {
             <div ref={(mount) => { this.mount = mount }}>
                 <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
                 <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
+                <Button id="clearWalls" variant="primary" onClick={this.clearWalls}>Clear Walls</Button>
             </div>
         );
         }
