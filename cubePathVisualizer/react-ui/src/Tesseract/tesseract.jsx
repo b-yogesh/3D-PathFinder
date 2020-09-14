@@ -95,7 +95,7 @@ export default class Tesseract extends React.Component {
         // scene.add( spotLight2 );
 
         var light = new THREE.AmbientLight( {color:0x111111});
-        // scene.add( light );
+         scene.add( light );
         // const color = 0xFFFFFF;
         // const intensity = 1;
         // const light = new THREE.DirectionalLight(color, intensity);
@@ -105,12 +105,12 @@ export default class Tesseract extends React.Component {
         var light = new THREE.PointLight(0xffffff);
         this.light = light;
         this.light.position.set(-15, 20, 30);
-        this.scene.add(light);
+        // this.scene.add(light);
         
         var light2 = new THREE.PointLight(0xffffff);
         this.light2 = light2;
         this.light2.position.set(15, -20, -30);
-        this.scene.add(light2);
+        // this.scene.add(light2);
 
         const groupCubes = new THREE.Group();
         const cubes = {};
@@ -120,18 +120,31 @@ export default class Tesseract extends React.Component {
        
         let delay;
         this.delay = delay;
-        var mazeColor = new THREE.Color(0xc2c2c2);
+        var mazeColor = new THREE.Color(0xffffff);
         this.mazeColor = mazeColor;
 
         let cubeDims = 5
         this.cubeDims = cubeDims;
         for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
             let geometry = new THREE.BoxGeometry(1,1,1);
-            const material = new THREE.MeshLambertMaterial({
-                vertexColors: THREE.FaceColors 
-                });
+            const loader = new THREE.TextureLoader(new THREE.LoadingManager());
+            // const material = new THREE.MeshLambertMaterial({
+            //     vertexColors: THREE.FaceColors,
+            //     });
+            let material;
+            let texture = loader.load(
+                require("../assets/images/road.jpg"));
+            
+            material = new THREE.MeshLambertMaterial({
+                map: texture,
+                side: THREE.FrontSide,
+                vertexColors: THREE.FaceColors,
+            });
             this.cubes[cubeNum] = new THREE.Mesh(geometry, material);
             this.cubes[cubeNum].name = String(cubeNum);
+            console.log(this.cubes[cubeNum]);
+           
+            
             for(var i =0;i<12;i++){
                 this.cubes[cubeNum].geometry.faces[i].color = mazeColor;
                 this.cubes[cubeNum].geometry.faces[i].isAWall = false;
@@ -140,6 +153,7 @@ export default class Tesseract extends React.Component {
 
             
             const edges = new THREE.EdgesGeometry(geometry);
+
             const edgesMaterial = new THREE.LineBasicMaterial({
                 color: 0x000000
             });
@@ -198,6 +212,7 @@ export default class Tesseract extends React.Component {
         var controls = new OrbitControls( camera, renderer.domElement );
         
         this.controls = controls;
+        this.controls.minDistance = 5;
         this.camera = camera;
         this.camera.position.z = 8;
         this.camera.position.y = 8;
@@ -544,10 +559,19 @@ export default class Tesseract extends React.Component {
         console.log("creating obstacle");
         let pos = this.intersects[intersectIndex].object.position;
         let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x00f00f,
-            vertexColors: THREE.FaceColors 
+        let material;
+        const loader = new THREE.TextureLoader(new THREE.LoadingManager());
+        let texture = loader.load(
+            require("../assets/images/building.jpg"));
+        
+        material = new THREE.MeshBasicMaterial({
+            map: texture
+    
         });
+        // const material = new THREE.MeshPhongMaterial({
+        //     color: 0x00f00f,
+        //     vertexColors: THREE.FaceColors 
+        // });
         let obstacle = new THREE.Mesh(geometry, material);
         obstacle.position.set(pos.x + offsetX, pos.y + offsetY, pos.z + offsetZ);
         obstacle.name = this.OBSTACLE;
