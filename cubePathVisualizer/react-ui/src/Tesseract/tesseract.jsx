@@ -7,7 +7,7 @@ import * as TWEEN from "tween";
 import * as helper from "../Helpers/helper.js"
 import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
 import edgesMapping from "../Mappings/edgesMapping";
-import BFS from "../Algorithms/BFS";
+import BFS from "../Algorithms/algorithms";
 
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -687,7 +687,7 @@ export default class Tesseract extends React.Component {
                  console.log("came here");
                  values = graph.bfs(this.source, this.target); break;
             case 2:
-                 values = graph.bfs(this.source, this.target); break;
+                 values = graph.dfs(this.source, this.target); break;
             case 3:
                  values = graph.bfs(this.source, this.target); break;
             case 4:
