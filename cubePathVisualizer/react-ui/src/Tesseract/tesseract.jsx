@@ -10,6 +10,8 @@ import edgesMapping from "../Mappings/edgesMapping";
 import BFS from "../Algorithms/BFS";
 
 import Button from 'react-bootstrap/Button';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -37,6 +39,8 @@ export default class Tesseract extends React.Component {
         this.animateShortestpath = this.animateShortestpath.bind(this);
         this.getVertices = this.getVertices.bind(this);
         this.faceIndexAndCubeIndexToVertex = this.faceIndexAndCubeIndexToVertex.bind(this);
+        this.setAlgorithm = this.setAlgorithm.bind(this);
+        this.setDelay = this.setDelay.bind(this);
         this.state = { text: "Click to Edit"};
     }
     
@@ -142,7 +146,7 @@ export default class Tesseract extends React.Component {
             });
             this.cubes[cubeNum] = new THREE.Mesh(geometry, material);
             this.cubes[cubeNum].name = String(cubeNum);
-            console.log(this.cubes[cubeNum]);
+            // console.log(this.cubes[cubeNum]);
            
             
             for(var i =0;i<12;i++){
@@ -230,7 +234,7 @@ export default class Tesseract extends React.Component {
         this.getVertices();
         this.source = 59;
         this.target = 148; 
-        
+        this.algo = 0;
           
     }
 
@@ -671,13 +675,32 @@ export default class Tesseract extends React.Component {
             
         }
             
-        graph.printGraph();
-        let values = graph.bfs(this.source, this.target);
+        // graph.printGraph();
+        if(this.algo === 0){
+            alert("Please select an algorithm");
+            return;
+        }
+        let values;
+        console.log("came here", this.algo);
+        switch(parseInt(this.algo)){
+            case 1:
+                 console.log("came here");
+                 values = graph.bfs(this.source, this.target); break;
+            case 2:
+                 values = graph.bfs(this.source, this.target); break;
+            case 3:
+                 values = graph.bfs(this.source, this.target); break;
+            case 4:
+                 values = graph.bfs(this.source, this.target); break;
+            case 5:
+                 values = graph.bfs(this.source, this.target); break;
+
+        }
+        // let values = graph.bfs(this.source, this.target);
         let visitedNodesInOrder = values[0];
         let path = values[1];
         console.log("path is...", path);
         console.log("nodes...", visitedNodesInOrder);
-        this.delay = 10;
         this.animateVisitedNodes(visitedNodesInOrder, path);
     }
 
@@ -782,6 +805,32 @@ export default class Tesseract extends React.Component {
             }
         }
     }
+
+    setAlgorithm(evt){
+        this.algo = evt; 
+        console.log(this.algo);
+    }
+
+    setDelay(delay){console.log(delay);
+        switch(parseInt(delay)){
+            case 1:
+                this.delay = 1000;
+                break;
+            case 2:
+                this.delay = 500;
+                break;
+            case 3:
+                this.delay = 100;
+                break;
+            case 4:
+                this.delay = 20
+                break;
+            case 5:
+                this.delay = 1;
+                break;
+        }
+        console.log(this.delay);
+    }
     
 
     render() {
@@ -792,6 +841,26 @@ export default class Tesseract extends React.Component {
                 <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
                 <Button id="clearWalls" variant="primary" onClick={this.clearWalls}>Clear Walls</Button>
                 <Button id="clearPath" variant="primary" onClick={this.clearPath}>Clear Path</Button>
+                <DropdownButton id="dropdown-basic-button" title="Choose Algorithm" style={{
+                    position: "absolute",
+                    top: "40%"
+                }} onSelect={this.setAlgorithm}>
+                    <Dropdown.Item eventKey="1" >Breadth First Search</Dropdown.Item>
+                    <Dropdown.Item eventKey="2" >Depth First Search</Dropdown.Item>
+                    <Dropdown.Item eventKey="3">Dijkastra</Dropdown.Item>
+                    <Dropdown.Item eventKey="4">A* Search</Dropdown.Item>
+                    <Dropdown.Item eventKey="5">Bidirectional BFS</Dropdown.Item>
+                </DropdownButton>
+                <DropdownButton id="dropdown-basic-button" title="Choose Speed" style={{
+                    position: "absolute",
+                    top: "50%"
+                }} onSelect={this.setDelay}>
+                    <Dropdown.Item eventKey="1" >Very Slow</Dropdown.Item>
+                    <Dropdown.Item eventKey="2" >Slow</Dropdown.Item>
+                    <Dropdown.Item eventKey="3">Normal</Dropdown.Item>
+                    <Dropdown.Item eventKey="4">Fast</Dropdown.Item>
+                    <Dropdown.Item eventKey="5">Superfast</Dropdown.Item>
+                </DropdownButton>
             </div>
         );
         }

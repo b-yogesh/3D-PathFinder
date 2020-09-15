@@ -1,7 +1,7 @@
-Button {
+.btn {
     position: absolute;
     align-items: center;
-    margin:2%;
+    margin:1%;
   }
 
 #visualize{
@@ -9,7 +9,7 @@ Button {
 }
 
 #clearWalls{
-  top: 20%;
+  top: 20%; 
 }
 
 #clearPath{
