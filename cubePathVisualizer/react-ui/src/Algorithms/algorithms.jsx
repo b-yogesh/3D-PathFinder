@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import * as setFaceColor from "../Helpers/helper.js"
 import Queue from "./Queue"
 import Stack from "./Stack"
+import PriorityQueue from "./PriorityQueue"
 import * as helper from "../Helpers/helper.js"
 import * as THREE from "three";
 
@@ -162,6 +163,61 @@ export default class BFS extends React.Component  {
                         }
             }
         }
+        return visitedNodesInOrder
+    }
+
+
+    dijkastra(startingNode, target){
+        var weight = [];
+        const INF = 1000000;
+        let visitedNodesInOrder = [];
+        var distances = Array(this.noOfVertices).fill(INF);
+        console.log(startingNode, target);
+        distances[startingNode] = 0;
+        var pred = []; 
+        for (var i = 0; i < this.noOfVertices; i++)
+        { 
+            weight[i] = 1;
+            pred[i] = -1; 
+        }
+        var pq = new PriorityQueue(); 
+        pq.enqueue(distances[startingNode], startingNode); 
+        var path = [];
+        while(!pq.isEmpty()){
+            let value = pq.front();
+            console.log(value);
+            pq.dequeue();
+            var d = value.priority;
+            var v = value.element;
+            if(d > distances[v]) continue
+            var get_List = this.AdjList.get(String(v)); 
+            console.log(get_List);
+            for(var i in get_List){
+                var neigh = get_List[i];
+                var w = weight[neigh];
+                console.log(neigh, w); 
+                console.log(distances[v] + w < distances[neigh]);
+                if(distances[v] + w < distances[neigh]){
+                    distances[neigh] = distances[v] + w;
+                    pq.enqueue(distances[neigh], neigh); 
+                    visitedNodesInOrder.push(neigh);
+                    pred[neigh] = v;
+                    if(parseInt(neigh) === parseInt(target)){
+                        console.log(pred);
+                        
+                        while (pred[target] != -1) {
+                            
+                            path.push(pred[target]); 
+                            target = pred[target]; 
+                        }
+                        
+                        // console.log(path);
+                        console.log(visitedNodesInOrder);
+                        return [visitedNodesInOrder, path];
+                    }
+                }  
+            } 
+        }    
         return visitedNodesInOrder
     }
 }

@@ -689,7 +689,7 @@ export default class Tesseract extends React.Component {
             case 2:
                  values = graph.dfs(this.source, this.target); break;
             case 3:
-                 values = graph.bfs(this.source, this.target); break;
+                 values = graph.dijkastra(this.source, this.target); break;
             case 4:
                  values = graph.bfs(this.source, this.target); break;
             case 5:
