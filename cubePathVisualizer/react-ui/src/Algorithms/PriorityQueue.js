@@ -65,4 +65,11 @@ export default class PriorityQueue {
             str += this.items[i].element + " "; 
         return str; 
     } 
+
+    includes(element){
+        var isIncluded = false;
+        for (var i = 0; i < this.items.length; i++) 
+            if(String(this.items[i].element) === String(element)) isIncluded = true;
+        return isIncluded; 
+    }
 } 

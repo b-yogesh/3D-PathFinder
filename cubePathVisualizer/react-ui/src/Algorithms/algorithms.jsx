@@ -9,15 +9,19 @@ import * as THREE from "three";
 
 
 
-export default class BFS extends React.Component  {
+export default class Graph extends React.Component  {
     
         constructor(props)
         { 
             super(props);
             console.log("Creating graph");
-            this.noOfVertices = props; 
+            console.log(props);
+            this.noOfVertices = props.length; 
             this.AdjList = new Map(); 
             this.delay = 50;
+            this.heuristic = this.heuristic.bind(this);
+            this.vertices = props.vertices;
+            this.cubeIndex = props.cubeIndex;
         } 
       
       
@@ -220,4 +224,100 @@ export default class BFS extends React.Component  {
         }    
         return visitedNodesInOrder
     }
+
+
+    a_star(startingNode, target){
+        let visitedNodesInOrder = [];
+        const INF = 1000000;
+        console.log(startingNode, target);
+        var pred = []; 
+        var gScore = [];
+        var fScore = [];
+        var hScore = [];
+        for (var i = 0; i < this.noOfVertices; i++)
+        { 
+            pred[i] = -1; 
+            gScore[i] = INF;
+            hScore[i] = INF;
+            fScore[i] = INF;
+        }
+        gScore[startingNode] = 0;
+        hScore[startingNode] = this.heuristic(this.vertices[String(startingNode)], this.vertices[String(target)]);
+        fScore = hScore;
+        let openSet = new PriorityQueue();
+        let closedSet = [];
+        openSet.enqueue(fScore[startingNode], startingNode); 
+        var path = [];
+        let parent = [];
+        console.log(openSet.isEmpty())
+        while(!openSet.isEmpty()){
+            let value = openSet.front();
+            console.log(openSet, value);
+            if(value.element === target){
+                console.log("Done");
+                while (pred[target] != -1) {
+                            
+                    path.push(pred[target]); 
+                    target = pred[target]; 
+                }
+                
+                // console.log(path);
+                console.log(visitedNodesInOrder);
+                return [visitedNodesInOrder, path];
+            }
+            openSet.dequeue();
+            var d = value.priority;
+            var v = value.element;
+            closedSet.push(String(v));
+            var get_List = this.AdjList.get(String(v)); 
+            console.log(get_List);
+            for(var i in get_List){
+                var neigh = get_List[i];
+                console.log(neigh); 
+                if(!closedSet.includes(neigh)){
+                    let tempGScore = gScore[v] + this.heuristic(this.vertices[String(neigh)], this.vertices[String(v)]);
+                    console.log("gScores:::", tempGScore, gScore[neigh])
+                    var vertex = this.vertices[String(neigh)]
+                    if(openSet.includes(neigh)){
+                        if(tempGScore < gScore[neigh]){
+                            console.log("if here",closedSet, neigh)
+                            parent[neigh] = v;
+                            var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
+                            console.log("Face",facePenalty);
+                            gScore[neigh] = tempGScore;
+                            hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
+                            fScore[neigh] = gScore[neigh] + hScore[neigh];
+                            if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            }
+                        }
+                        else{
+                            console.log("else here",closedSet, neigh)
+                            parent[neigh] = v;
+                            gScore[neigh] = tempGScore;
+                            var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
+                            console.log("else Face",facePenalty);
+                            hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
+                            fScore[neigh] = gScore[neigh] + hScore[neigh];
+                            if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            visitedNodesInOrder.push(neigh);
+                            openSet.enqueue(fScore[neigh], neigh);
+                        }   
+            }
+            console.log("fScores:::",fScore[neigh]) 
+        } 
+        console.log("openset after loop:::", openSet.printPQueue())
+    } 
+        console.log(visitedNodesInOrder, closedSet)  
+        return visitedNodesInOrder
+    }
+
+    heuristic(a,b){
+        // console.log("heuristic", a,b, this.AdjList);
+        var heuristic = Math.sqrt(Math.pow((a[0] - b[0]),2) + 
+                                  Math.pow((a[1] - b[1]),2) +
+                                  Math.pow((a[2] - b[2]),2))
+        console.log("heuristic:::", heuristic)                        
+        return heuristic;
+    }
+
 }

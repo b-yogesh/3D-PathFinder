@@ -25,3 +25,17 @@ export function coordsToIndex(coords){
     //console.log("index>>>>", index, this.cubeDims);
     return index
 }
+
+export function checkHowManyFaces(x,y,z,cubeIndex){
+    let faces = 0;
+    if(x===cubeIndex || x===-cubeIndex){
+        faces += 1;
+    }
+    if(y===cubeIndex || y === -cubeIndex){
+        faces += 1;
+    }
+    if(z===cubeIndex || z === -cubeIndex){
+        faces += 1;
+    }
+    return faces;
+}

@@ -7,7 +7,7 @@ import * as TWEEN from "tween";
 import * as helper from "../Helpers/helper.js"
 import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
 import edgesMapping from "../Mappings/edgesMapping";
-import BFS from "../Algorithms/algorithms";
+import Graph from "../Algorithms/algorithms";
 
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -29,7 +29,6 @@ export default class Tesseract extends React.Component {
         this.onDocumentMouseMove = this.onDocumentMouseMove.bind(this);
         this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
         this.onWindowResize = this.onWindowResize.bind(this);
-        this.checkHowManyFaces = this.checkHowManyFaces.bind(this);
         this.createGraph = this.createGraph.bind(this);
         this.clearWalls = this.clearWalls.bind(this);
         this.createObstacle = this.createObstacle.bind(this);
@@ -623,7 +622,7 @@ export default class Tesseract extends React.Component {
         for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
-                    var noOfFaces = this.checkHowManyFaces(x,y,z);
+                    var noOfFaces = helper.checkHowManyFaces(x,y,z, this.cubeIndex);
                     if(noOfFaces!=0){
                         var index = this.coordsToIndex(new THREE.Vector3(x,y,z));
                         var map = cubesToFaces[index];
@@ -645,7 +644,7 @@ export default class Tesseract extends React.Component {
 
     createGraph(){
         var length = Object.keys(this.vertices).length;
-        var graph = new BFS(length);
+        var graph = new Graph({length: length, vertices: this.vertices, cubeIndex: this.cubeIndex});
         console.log(this.vertices);
         for(let key in this.vertices){
             graph.addVertex(key);
@@ -691,7 +690,7 @@ export default class Tesseract extends React.Component {
             case 3:
                  values = graph.dijkastra(this.source, this.target); break;
             case 4:
-                 values = graph.bfs(this.source, this.target); break;
+                 values = graph.a_star(this.source, this.target); break;
             case 5:
                  values = graph.bfs(this.source, this.target); break;
 
@@ -730,19 +729,6 @@ export default class Tesseract extends React.Component {
         }
     }
 
-    checkHowManyFaces(x,y,z){
-        let faces = 0;
-        if(x===this.cubeIndex || x===-this.cubeIndex){
-            faces += 1;
-        }
-        if(y===this.cubeIndex || y === -this.cubeIndex){
-            faces += 1;
-        }
-        if(z===this.cubeIndex || z === -this.cubeIndex){
-            faces += 1;
-        }
-        return faces;
-    }
 
     faceIndexAndCubeIndexToVertex(faceIndex, cubeIndex){
         for(let v in this.vertices){
