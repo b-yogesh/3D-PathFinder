@@ -313,9 +313,13 @@ export default class Graph extends React.Component  {
 
     heuristic(a,b){
         // console.log("heuristic", a,b, this.AdjList);
-        var heuristic = Math.sqrt(Math.pow((a[0] - b[0]),2) + 
-                                  Math.pow((a[1] - b[1]),2) +
-                                  Math.pow((a[2] - b[2]),2))
+        // var heuristic = Math.sqrt(Math.pow((a[0] - b[0]),2) + 
+        //                           Math.pow((a[1] - b[1]),2) +
+        //                           Math.pow((a[2] - b[2]),2))
+
+        var heuristic = Math.abs((a[0] - b[0]))+ 
+                        Math.abs((a[1] - b[1]))+
+                        Math.abs((a[2] - b[2]))
         console.log("heuristic:::", heuristic)                        
         return heuristic;
     }

@@ -18,6 +18,8 @@ export default class PriorityQueue {
         var contain = false; 
     
         for (var i = 0; i < this.items.length; i++) { 
+            console.log("loop elemtn:::",this.items[i].element, this.items[i].priority)
+            console.log("enqueue elemtn:::",qElement.element, qElement.priority)
             if (this.items[i].priority > qElement.priority) { 
                 this.items.splice(i, 0, qElement); 
                 contain = true; 
