@@ -257,7 +257,7 @@ export default class Graph extends React.Component  {
         while(!openSet.isEmpty()){
             let value = openSet.front();
             console.log(openSet, value);
-            if(value.element === target){
+            if(String(value.element) === String(target)){
                 console.log("Done");
                 while (pred[target] != -1) {
                             
@@ -265,7 +265,7 @@ export default class Graph extends React.Component  {
                     target = pred[target]; 
                 }
                 
-                // console.log(path);
+                console.log(path);
                 console.log(visitedNodesInOrder);
                 return [visitedNodesInOrder, path];
             }
@@ -286,18 +286,31 @@ export default class Graph extends React.Component  {
                     if(openSet.includes(neigh)){
                         if(tempGScore < gScore[neigh]){
                             console.log("if here",closedSet, neigh)
-                            parent[neigh] = v;
+                            pred[neigh] = v;
                             var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
                             console.log("Face",facePenalty);
                             gScore[neigh] = tempGScore;
                             hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
                             fScore[neigh] = gScore[neigh] + hScore[neigh];
                             // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            if(String(neigh) === String(target)){
+                                console.log("Done in for loop", pred);
+                                while (pred[target] != -1) {
+                                            
+                                    path.push(pred[target]); 
+                                    target = pred[target]; 
+                                    console.log(path);
+                                }
+                                
+                                console.log(path);
+                                console.log(visitedNodesInOrder);
+                                return [visitedNodesInOrder, path];
+                            }
                             }
                         }
                         else{
                             console.log("else here",closedSet, neigh)
-                            parent[neigh] = v;
+                            pred[neigh] = v;
                             gScore[neigh] = tempGScore;
                             var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
                             console.log("else Face",facePenalty);
@@ -308,6 +321,19 @@ export default class Graph extends React.Component  {
                             console.log(currentVertex, vertex, currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2])
                             if(currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2]) 
                             fScore[neigh] = fScore[neigh] + 1;
+                            if(String(neigh) === String(target)){
+                                console.log("Done in for loop", pred);
+                                while (pred[target] != -1) {
+                                            
+                                    path.push(pred[target]); 
+                                    target = pred[target]; 
+                                    console.log(path);
+                                }
+                                
+                                console.log(path);
+                                console.log(visitedNodesInOrder);
+                                return [visitedNodesInOrder, path];
+                            }
                             visitedNodesInOrder.push(neigh);
                             openSet.enqueue(fScore[neigh], neigh);
                         }   
