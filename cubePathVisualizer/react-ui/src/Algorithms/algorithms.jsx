@@ -22,7 +22,11 @@ export default class Graph extends React.Component  {
             this.heuristic = this.heuristic.bind(this);
             this.vertices = props.vertices;
             this.cubeIndex = props.cubeIndex;
-        } 
+            this.printPath = this.printPath.bind(this);
+            this.biBFS = this.biBFS.bind(this);
+            this.isIntersecting = this.isIntersecting.bind(this);
+            this.bidirectional_bfs = this.bidirectional_bfs.bind(this);
+        }  
       
       
         addVertex(v) { 
@@ -278,6 +282,7 @@ export default class Graph extends React.Component  {
                     let tempGScore = gScore[v] + this.heuristic(this.vertices[String(neigh)], this.vertices[String(v)]);
                     console.log("gScores:::", tempGScore, gScore[neigh])
                     var vertex = this.vertices[String(neigh)]
+                    var currentVertex = this.vertices[String(v)]
                     if(openSet.includes(neigh)){
                         if(tempGScore < gScore[neigh]){
                             console.log("if here",closedSet, neigh)
@@ -287,7 +292,7 @@ export default class Graph extends React.Component  {
                             gScore[neigh] = tempGScore;
                             hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
                             fScore[neigh] = gScore[neigh] + hScore[neigh];
-                            if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
                             }
                         }
                         else{
@@ -298,7 +303,11 @@ export default class Graph extends React.Component  {
                             console.log("else Face",facePenalty);
                             hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
                             fScore[neigh] = gScore[neigh] + hScore[neigh];
-                            if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
+                            // try adding penalty only if current face and neigh lie on same co ordinates
+                            console.log(currentVertex, vertex, currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2])
+                            if(currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2]) 
+                            fScore[neigh] = fScore[neigh] + 1;
                             visitedNodesInOrder.push(neigh);
                             openSet.enqueue(fScore[neigh], neigh);
                         }   
@@ -322,6 +331,123 @@ export default class Graph extends React.Component  {
                         Math.abs((a[2] - b[2]))
         console.log("heuristic:::", heuristic)                        
         return heuristic;
+    }
+
+
+    // Bidirectional BFS
+
+
+    bidirectional_bfs(source, target){
+        let s_visited = [];
+        let t_visited = [];
+        let s_parent = [];
+        let t_parent = [];
+        let visitedNodesInOrder = [];
+        this.visitedNodesInOrder = visitedNodesInOrder;
+        let s_queue = new Queue();
+        let t_queue = new Queue();
+        this.s_queue = s_queue;
+        this.t_queue = t_queue;
+        this.s_visited = s_visited;
+        this.t_visited = t_visited;
+        this.s_parent = s_parent;
+        this.t_parent = t_parent;
+        let intersectNode = -1;
+        console.log(this.s_visited);
+        for(var i = 0; i<this.noOfVertices; i++){
+            this.s_visited.push(false); 
+            this.t_visited.push(false); 
+        }
+        console.log(this.s_visited);
+        this.s_queue.enqueue(source); 
+        this.s_visited[source] = true; 
+        this.s_parent[source]=-1; 
+    
+        this.t_queue.enqueue(target); 
+        this.t_visited[target] = true; 
+        this.t_parent[target] = -1; 
+
+        while (!this.s_queue.isEmpty() && !this.t_queue.isEmpty()){
+            console.log("Queues....", this.s_queue, this.t_queue)
+            this.biBFS(this.s_queue, this.s_visited, this.s_parent);
+            this.biBFS(this.t_queue, this.t_visited, this.t_parent);
+
+            intersectNode = this.isIntersecting(this.s_visited, this.t_visited); 
+
+            if(intersectNode != -1) 
+            { 
+                let path = this.printPath(this.s_parent, this.t_parent, source, target, intersectNode); 
+                return [visitedNodesInOrder, path]
+            } 
+        }
+        return -1;
+    }
+
+
+    biBFS(queue, visited, parent){
+        let current = queue.getFront();
+        queue.dequeue();
+        var get_List = this.AdjList.get(String(current)); 
+        for(var i in get_List){
+            var neigh = get_List[i];
+            console.log(neigh); 
+            if(!visited[neigh]){
+                this.visitedNodesInOrder.push(neigh);
+                parent[neigh] = current;
+                visited[neigh] = true;
+                queue.enqueue(neigh);
+            }
+        }
+
+    }
+
+
+    printPath(s_parent, t_parent, source, target, intersectNode){
+        let path = [];
+        path.push(intersectNode);
+
+        let i = intersectNode;
+        while(s_parent[i]!=source){
+            path.push(s_parent[i]);
+            i=s_parent[i];
+        }
+
+        i = intersectNode;
+        let reverse_path = []
+        while(t_parent[i]!=target){
+            reverse_path.push(t_parent[i]);
+            i=t_parent[i];
+        }
+
+        reverse_path = reverse_path.reverse();
+        path = path.concat(reverse_path);
+        for(i = 0; i < path.length; i++){
+            console.log(path[i]);
+        }
+
+        let newPath = [];
+        for(i = 0; i < path.length/2; i++){
+                newPath.push(path[i])
+                if(newPath.length <= path.length)
+                newPath.push(path[path.length-i-1])
+        }
+        newPath.push(target);
+
+
+        for(i = 0; i < path.length; i++){
+            console.log("newpath...", newPath[i]);
+        }
+        
+        return newPath;
+    }
+
+
+    isIntersecting(s_visited, t_visited){
+        for(var i=0;i<this.noOfVertices;i++){ 
+            if(s_visited[i] && t_visited[i]) 
+                return i; 
+        } 
+        return -1; 
     }
 
 }

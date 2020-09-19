@@ -692,7 +692,7 @@ export default class Tesseract extends React.Component {
             case 4:
                  values = graph.a_star(this.source, this.target); break;
             case 5:
-                 values = graph.bfs(this.source, this.target); break;
+                 values = graph.bidirectional_bfs(this.source, this.target); break;
 
         }
         // let values = graph.bfs(this.source, this.target);
