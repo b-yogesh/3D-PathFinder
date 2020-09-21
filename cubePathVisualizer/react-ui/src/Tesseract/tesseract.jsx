@@ -7,6 +7,7 @@ import * as TWEEN from "tween";
 import * as helper from "../Helpers/helper.js"
 import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
 import edgesMapping from "../Mappings/edgesMapping";
+import mapper from "../Mappings/edgesmapper";
 import Graph from "../Algorithms/algorithms";
 
 import Button from 'react-bootstrap/Button';
@@ -770,7 +771,7 @@ export default class Tesseract extends React.Component {
         }
     }
 
-
+    
     clearPath(){
         for(let v in this.vertices){
             helper.setFaceColor(this.cubes[this.vertices[v][3]].geometry, this.mazeColor, this.vertices[v][4]);
@@ -817,6 +818,11 @@ export default class Tesseract extends React.Component {
         }
         console.log(this.delay);
     }
+
+    
+    genMapping(){
+        mapper(this.cubes, this.vertices, this.cubeIndex);
+    }
     
 
     render() {
@@ -847,6 +853,7 @@ export default class Tesseract extends React.Component {
                     <Dropdown.Item eventKey="4">Fast</Dropdown.Item>
                     <Dropdown.Item eventKey="5">Superfast</Dropdown.Item>
                 </DropdownButton>
+                <Button id="genMapping" variant="primary" onClick={this.genMapping.bind(this)}>Generate Vertex Mappings</Button>
             </div>
         );
         }

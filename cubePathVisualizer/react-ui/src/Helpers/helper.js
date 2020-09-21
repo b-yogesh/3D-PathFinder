@@ -23,7 +23,7 @@ export function coordsToIndex(coords){
     console.log(start_index);
     let index = Math.abs(x - start_index.x) + cubeDims*Math.abs(y - start_index.y) + Math.pow(cubeDims,2)*Math.abs(z - start_index.z);
     //console.log("index>>>>", index, this.cubeDims);
-    return index
+    return parseInt(index)
 }
 
 export function checkHowManyFaces(x,y,z,cubeIndex){
@@ -38,4 +38,23 @@ export function checkHowManyFaces(x,y,z,cubeIndex){
         faces += 1;
     }
     return faces;
+}
+
+export function faceIndexAndCubeIndexToVertex(faceIndex, cubeIndex, vertices){
+    // console.log(faceIndex, cubeIndex, vertices)
+    for(let v in vertices){
+        if(vertices[v][3] === cubeIndex){
+            if(vertices[v][4] === faceIndex)
+                return v;
+            if(faceIndex % 2 == 0){
+                if(vertices[v][4] === faceIndex+1)
+                    return v;
+            }
+            else{
+                if(vertices[v][4] === faceIndex-1)
+                    return v;
+            }
+        }
+    }
+    return -1;
 }
