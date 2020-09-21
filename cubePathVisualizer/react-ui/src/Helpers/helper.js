@@ -18,9 +18,8 @@ export function coordsToIndex(coords){
     let y = coords.y;
     let z = coords.z;
     var start_index;
-    var cubeDims = 5;
+    var cubeDims = 9;
     start_index = {x:Math.floor(cubeDims / 2),y:-Math.floor(cubeDims / 2),z:Math.floor(cubeDims / 2)};
-    console.log(start_index);
     let index = Math.abs(x - start_index.x) + cubeDims*Math.abs(y - start_index.y) + Math.pow(cubeDims,2)*Math.abs(z - start_index.z);
     //console.log("index>>>>", index, this.cubeDims);
     return parseInt(index)

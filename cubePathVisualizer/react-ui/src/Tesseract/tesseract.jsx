@@ -9,6 +9,8 @@ import cubesToFaces from "../Mappings/cubeToFaceMapping.js";
 import edgesMapping from "../Mappings/edgesMapping";
 import mapper from "../Mappings/edgesmapper";
 import Graph from "../Algorithms/algorithms";
+import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
+
 
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -122,22 +124,21 @@ export default class Tesseract extends React.Component {
         const edges = {};
         this.edges = edges;
        
-        let delay;
-        this.delay = delay;
+        this.delay = 200;
         var mazeColor = new THREE.Color(0xffffff);
         this.mazeColor = mazeColor;
 
-        let cubeDims = 5
+        let cubeDims = 9
         this.cubeDims = cubeDims;
+        const loader = new THREE.TextureLoader(new THREE.LoadingManager());
+        let texture = loader.load(
+            require("../assets/images/road.jpg"));
         for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
             let geometry = new THREE.BoxGeometry(1,1,1);
-            const loader = new THREE.TextureLoader(new THREE.LoadingManager());
             // const material = new THREE.MeshLambertMaterial({
-            //     vertexColors: THREE.FaceColors,
+                //     vertexColors: THREE.FaceColors,
             //     });
             let material;
-            let texture = loader.load(
-                require("../assets/images/road.jpg"));
             
             material = new THREE.MeshLambertMaterial({
                 map: texture,
@@ -174,20 +175,20 @@ export default class Tesseract extends React.Component {
         console.log("satrindex", this.start_index);
         let cubeIndex = parseInt(cubeDims / 2)
         this.cubeIndex = cubeIndex;
-        console.log("cubeindex>:::", cubeIndex);
+        console.log("cubeindex>:::", this.cubeIndex);
         let cubePositions = [];
         this.cubePositions = cubePositions;
-        let STARTING_POINT = 45
-        let ENDING_POINT = 124
+        let STARTING_POINT = 0
+        let ENDING_POINT = 3
         this.STARTING_POINT = STARTING_POINT
         this.ENDING_POINT = ENDING_POINT
         let initialStartCoord;
         this.initialStartCoord = initialStartCoord;
         var initialEndCoord;
         this.initialEndCoord = initialEndCoord;
-        var initialSFaceIndex = 4;
+        var initialSFaceIndex = 8;
         this.initialSFaceIndex = initialSFaceIndex;
-        var initialEFaceIndex = 4;
+        var initialEFaceIndex = 8;
         this.initialEFaceIndex = initialEFaceIndex;
         for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
@@ -232,8 +233,8 @@ export default class Tesseract extends React.Component {
         var ray = new THREE.Raycaster( this.camera.position, vector.sub( this.camera.position ).normalize() );
         this.ray = ray;
         this.getVertices();
-        this.source = 59;
-        this.target = 148; 
+        this.source = 1;
+        this.target = 7; 
         this.algo = 0;
           
     }
@@ -620,13 +621,16 @@ export default class Tesseract extends React.Component {
     getVertices(){
         let vertex = 0;
         let vertices = {};
+        let maps = cubeToFaceMapper(this.cubeIndex);
         for (let z = this.cubeIndex; z >= -this.cubeIndex; z--) {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
                     var noOfFaces = helper.checkHowManyFaces(x,y,z, this.cubeIndex);
                     if(noOfFaces!=0){
                         var index = this.coordsToIndex(new THREE.Vector3(x,y,z));
-                        var map = cubesToFaces[index];
+                        // var map = cubesToFaces[index];
+                        var map = maps[index];
+                        // console.log("mpa and indx:::", map, index, this.cubeIndex)
                         for(var i = 0; i < noOfFaces; i++){
                             //console.log(map[i]);
                             //console.log(vertex,x,y,z);
@@ -651,6 +655,7 @@ export default class Tesseract extends React.Component {
             graph.addVertex(key);
         }
         let wallNodes = [];
+        let edgesMapping = mapper(this.cubes, this.vertices, this.cubeIndex);
         for(let edge in edgesMapping){
             let e = edgesMapping[edge];
             let index = this.vertices[edge][3];

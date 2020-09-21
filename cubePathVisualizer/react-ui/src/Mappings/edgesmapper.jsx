@@ -118,4 +118,5 @@ export default function mapper(cubes, vertices, cubeIndex){
             
         }
         console.log(neighbours)
+        return neighbours
 }
