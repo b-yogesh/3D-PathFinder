@@ -67,7 +67,9 @@ export default class Maze extends React.Component  {
             let z = vertex[2];
             let index = vertex[3];
             let faceIndex = vertex[4];
-            console.log(this.cubes[index]);
+            console.log(this.cubes[index].geometry.faces[faceIndex].name);
+            let name = this.cubes[index].geometry.faces[faceIndex].name;
+            if(name === "start" || name === "end" || this.cubes[index].geometry.faces[faceIndex].isAWall) return
             let normal = this.cubes[index].geometry.faces[faceIndex].normal;
             console.log("normal", normal);
             let offsetX, offsetY, offsetZ = 0;

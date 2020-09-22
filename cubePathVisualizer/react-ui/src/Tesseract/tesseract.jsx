@@ -718,8 +718,12 @@ export default class Tesseract extends React.Component {
         // let values = graph.bfs(this.source, this.target);
         let visitedNodesInOrder = values[0];
         let path = values[1];
-        console.log("path is...", path);
+        console.log("path is...", path, path.length);
         console.log("nodes...", visitedNodesInOrder);
+        if(path.length < 2){
+            alert("No path exists");
+            return;
+        }
         this.animateVisitedNodes(visitedNodesInOrder, path);
     }
 
