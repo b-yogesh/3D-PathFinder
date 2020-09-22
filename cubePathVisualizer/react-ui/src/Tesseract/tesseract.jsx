@@ -10,6 +10,7 @@ import edgesMapping from "../Mappings/edgesMapping";
 import mapper from "../Mappings/edgesmapper";
 import Graph from "../Algorithms/algorithms";
 import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
+import Maze from "../Algorithms/MazeAlgorithm";
 
 
 import Button from 'react-bootstrap/Button';
@@ -603,7 +604,7 @@ export default class Tesseract extends React.Component {
 
 
     removeObstacle(intersectIndex){
-        console.log("remving obstacle", this.intersects[intersectIndex].object.uuid);
+        console.log("remving obstacle", this.intersects[intersectIndex].object.vertexIndex);
         let p = this.intersects[intersectIndex].object.position;
         let vertexIndex = this.intersects[intersectIndex].object.vertexIndex;
         console.log("vertexIndex...", vertexIndex);
@@ -824,11 +825,22 @@ export default class Tesseract extends React.Component {
         console.log(this.delay);
     }
 
-    
-    genMapping(){
-        mapper(this.cubes, this.vertices, this.cubeIndex);
+    createMaze(){
+        var length = Object.keys(this.vertices).length;
+        let maze = new Maze({
+            length: length, 
+            vertices: this.vertices, 
+            cubeIndex: this.cubeIndex,
+            cubes: this.cubes,
+        });
+        console.log("befire", this.cubes[0]);
+        let obstacles = maze.createMaze();
+        console.log(obstacles, this.cubes[3]);
+        for(let obstacle in obstacles){
+            this.scene.add(obstacles[obstacle])
+        }
     }
-    
+
 
     render() {
         const { text } = this.state
@@ -858,7 +870,7 @@ export default class Tesseract extends React.Component {
                     <Dropdown.Item eventKey="4">Fast</Dropdown.Item>
                     <Dropdown.Item eventKey="5">Superfast</Dropdown.Item>
                 </DropdownButton>
-                <Button id="genMapping" variant="primary" onClick={this.genMapping.bind(this)}>Generate Vertex Mappings</Button>
+                <Button id="maze" variant="primary" onClick={this.createMaze.bind(this)}>Create Maze</Button>
             </div>
         );
         }
