@@ -134,18 +134,18 @@ export default class Tesseract extends React.Component {
         const loader = new THREE.TextureLoader(new THREE.LoadingManager());
         let texture = loader.load(
             require("../assets/images/road.jpg"));
+        let material;
+        
+            material = new THREE.MeshLambertMaterial({
+            map: texture,
+            side: THREE.FrontSide,
+            vertexColors: THREE.FaceColors,
+        });
         for(let cubeNum = 0; cubeNum < Math.pow(cubeDims, 3); cubeNum++){
             let geometry = new THREE.BoxGeometry(1,1,1);
             // const material = new THREE.MeshLambertMaterial({
                 //     vertexColors: THREE.FaceColors,
             //     });
-            let material;
-            
-            material = new THREE.MeshLambertMaterial({
-                map: texture,
-                side: THREE.FrontSide,
-                vertexColors: THREE.FaceColors,
-            });
             this.cubes[cubeNum] = new THREE.Mesh(geometry, material);
             this.cubes[cubeNum].name = String(cubeNum);
             // console.log(this.cubes[cubeNum]);
@@ -567,8 +567,21 @@ export default class Tesseract extends React.Component {
         let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
         let material;
         const loader = new THREE.TextureLoader(new THREE.LoadingManager());
-        let texture = loader.load(
-            require("../assets/images/building.jpg"));
+        let rand = Math.random();
+        let texture;
+        if(rand < 0.33){
+            texture = loader.load(
+                require("../assets/images/building1.jpg"));
+        }
+        else if(rand > 0.66){
+            texture = loader.load(
+                require("../assets/images/building2.jpg"));
+        }
+        else{
+            texture = loader.load(
+                require("../assets/images/building3.jpg"));
+        }
+        
         
         material = new THREE.MeshBasicMaterial({
             map: texture

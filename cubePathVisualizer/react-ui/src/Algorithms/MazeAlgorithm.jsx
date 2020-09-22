@@ -24,10 +24,26 @@ export default class Maze extends React.Component  {
             this.obstacles = [];
             const loader = new THREE.TextureLoader(new THREE.LoadingManager());
             let texture = loader.load(
-                require("../assets/images/building.jpg")
+                require("../assets/images/building1.jpg")
                 );
             
-            this.material = new THREE.MeshBasicMaterial({
+            this.material1 = new THREE.MeshBasicMaterial({
+                 map: texture
+            });
+
+            texture = loader.load(
+                require("../assets/images/building2.jpg")
+                );
+            
+            this.material2 = new THREE.MeshBasicMaterial({
+                 map: texture
+            });
+
+            texture = loader.load(
+                require("../assets/images/building3.jpg")
+                );
+            
+            this.material3 = new THREE.MeshBasicMaterial({
                  map: texture
             });
         
@@ -116,7 +132,18 @@ export default class Maze extends React.Component  {
             //     color: 0x00f00f,
             //     vertexColors: THREE.FaceColors 
             // });
-            let obstacle = new THREE.Mesh(geometry, this.material);
+            let rand = Math.random();
+            let material;
+            if(rand < 0.33){
+               material = this.material1;
+            }
+            else if(rand > 0.66){
+                material = this.material2;
+            }
+            else{
+                material = this.material3;
+            }
+            let obstacle = new THREE.Mesh(geometry, material);
             obstacle.position.set(pos.x + offsetX, pos.y + offsetY, pos.z + offsetZ);
             obstacle.name = "obstacle";
             // obstacle.vertex = this.vertices[];
