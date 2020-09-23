@@ -64,8 +64,8 @@ export default class Tesseract extends React.Component {
         this.renderer.setClearColor( 0x545454, 1 );
         this.mount.appendChild( this.renderer.domElement );
         this.scene = scene;
-        this.scene.background = new THREE.Color(0xbbd6ff);
-        this.scene.fog = new THREE.Fog(0xffffff, 0, 750);
+        this.scene.background = new THREE.Color(0x121212);
+        this.scene.fog = new THREE.Fog(0xffffff, 0, 150);
     
 
         var OBSTACLE = "obstacle";
@@ -93,31 +93,9 @@ export default class Tesseract extends React.Component {
         var hoverUseColor;
         this.hoverUseColor = hoverUseColor;
 
-        var spotLight = new THREE.DirectionalLight( {color:0xffffff});
-        spotLight.position.set( -1, 2, 3 );
-        // scene.add( spotLight );
-
-        var spotLight2 = new THREE.DirectionalLight( {color:0xffffff});
-        spotLight2.position.set( 1, -2, -3 );
-        // scene.add( spotLight2 );
 
         var light = new THREE.AmbientLight( {color:0x111111});
-         scene.add( light );
-        // const color = 0xFFFFFF;
-        // const intensity = 1;
-        // const light = new THREE.DirectionalLight(color, intensity);
-        // light.position.set(-1, 2, 4);
-        // camera.add(light);
-        
-        var light = new THREE.PointLight(0xffffff);
-        this.light = light;
-        this.light.position.set(-15, 20, 30);
-        // this.scene.add(light);
-        
-        var light2 = new THREE.PointLight(0xffffff);
-        this.light2 = light2;
-        this.light2.position.set(15, -20, -30);
-        // this.scene.add(light2);
+        scene.add( light );
 
         const groupCubes = new THREE.Group();
         const cubes = {};
@@ -218,7 +196,7 @@ export default class Tesseract extends React.Component {
         var controls = new OrbitControls( camera, renderer.domElement );
         
         this.controls = controls;
-        this.controls.minDistance = 5;
+        this.controls.minDistance = 8;
         this.camera = camera;
         this.camera.position.z = 8;
         this.camera.position.y = 8;
@@ -895,8 +873,11 @@ export default class Tesseract extends React.Component {
                     <Button id="clearPath" variant="danger" onClick={this.clearPath}>Clear Path</Button>
                 </div>
                 <div ref={(mount) => { this.mount = mount }}></div>
+                <a id="github" href="https://github.com/b-yogesh/3D-PathFinder">
+                    <img src={require('../assets/icons/github-logo.png')} alt="" style={{  width:"2vw"}}/>
+                </a>
             </div>
-        );
+        ); 
         }
  
 }
