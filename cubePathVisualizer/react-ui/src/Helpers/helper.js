@@ -40,7 +40,7 @@ export function checkHowManyFaces(x,y,z,cubeIndex){
 }
 
 export function faceIndexAndCubeIndexToVertex(faceIndex, cubeIndex, vertices){
-    console.log(faceIndex, cubeIndex, vertices)
+    // console.log(faceIndex, cubeIndex, vertices)
     for(let v in vertices){
         if(vertices[v][3] === cubeIndex){
             if(vertices[v][4] === faceIndex)

@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import ReactDOM from "react-dom";
-import './tesseract.css';
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
 import * as TWEEN from "tween";
@@ -11,12 +10,13 @@ import mapper from "../Mappings/edgesmapper";
 import Graph from "../Algorithms/algorithms";
 import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
 import Maze from "../Algorithms/MazeAlgorithm";
-
+import * as $ from 'jquery';
 
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './tesseract.css';
 
 
 export default class Tesseract extends React.Component {
@@ -44,7 +44,7 @@ export default class Tesseract extends React.Component {
         this.faceIndexAndCubeIndexToVertex = this.faceIndexAndCubeIndexToVertex.bind(this);
         this.setAlgorithm = this.setAlgorithm.bind(this);
         this.setDelay = this.setDelay.bind(this);
-        this.state = { text: "Click to Edit"};
+        this.state = { text: "Change Start/End points"};
     }
     
     
@@ -242,8 +242,8 @@ export default class Tesseract extends React.Component {
 
         
     changeText(){
-    console.log(this.state.text, String(this.state.text) === "Click to Edit");
-    if(String(this.state.text) === "Click to Edit"){
+    console.log(this.state.text, String(this.state.text) === "Change Start/End points");
+    if(String(this.state.text) === "Change Start/End points"){
         var text =  "Exit Edit Mode";
         this.setState({ text: text },
         ()=>{
@@ -252,7 +252,7 @@ export default class Tesseract extends React.Component {
 
     }
     else{
-        this.setState({ text:"Click to Edit" });
+        this.setState({ text:"Change Start/End points" });
         document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
 
     }  
@@ -702,16 +702,16 @@ export default class Tesseract extends React.Component {
         let values;
         console.log("came here", this.algo);
         switch(parseInt(this.algo)){
-            case 1:
+            case 0:
                  console.log("came here");
                  values = graph.bfs(this.source, this.target); break;
-            case 2:
+            case 1:
                  values = graph.dfs(this.source, this.target); break;
-            case 3:
+            case 2:
                  values = graph.dijkastra(this.source, this.target); break;
-            case 4:
+            case 3:
                  values = graph.a_star(this.source, this.target); break;
-            case 5:
+            case 4:
                  values = graph.bidirectional_bfs(this.source, this.target); break;
 
         }
@@ -816,12 +816,13 @@ export default class Tesseract extends React.Component {
         }
     }
 
-    setAlgorithm(evt){
+    setAlgorithm(evt, name){
         this.algo = evt; 
-        console.log(this.algo);
+        console.log(this.algo,name);
+        $("#dropdown-algorithms").text(this.algorithms[this.algo]); 
     }
 
-    setDelay(delay){console.log(delay);
+    setDelay(delay, name){
         switch(parseInt(delay)){
             case 1:
                 this.delay = 1000;
@@ -840,6 +841,7 @@ export default class Tesseract extends React.Component {
                 break;
         }
         console.log(this.delay);
+        $("#dropdown-speed").text(this.speed[delay]);
     }
 
     createMaze(){
@@ -860,34 +862,39 @@ export default class Tesseract extends React.Component {
 
 
     render() {
-        const { text } = this.state
+        const { text } = this.state;
+        this.algorithms = ["Breadth First Search","Depth First Search",
+                           "Dijkastra","A* Search","Bidirectional BFS"];
+        this.speed = ["Very Slow","Slow","Normal","Fast","Superfast"]
         return (
-            <div className="cont" ref={(mount) => { this.mount = mount }}>
-                <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
-                <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
-                <Button id="clearWalls" variant="primary" onClick={this.clearWalls}>Clear Walls</Button>
-                <Button id="clearPath" variant="primary" onClick={this.clearPath}>Clear Path</Button>
-                <DropdownButton id="dropdown-basic-button" title="Choose Algorithm" style={{
-                    position: "absolute",
-                    top: "40%"
-                }} onSelect={this.setAlgorithm}>
-                    <Dropdown.Item eventKey="1" >Breadth First Search</Dropdown.Item>
-                    <Dropdown.Item eventKey="2" >Depth First Search</Dropdown.Item>
-                    <Dropdown.Item eventKey="3">Dijkastra</Dropdown.Item>
-                    <Dropdown.Item eventKey="4">A* Search</Dropdown.Item>
-                    <Dropdown.Item eventKey="5">Bidirectional BFS</Dropdown.Item>
-                </DropdownButton>
-                <DropdownButton id="dropdown-basic-button" title="Choose Speed" style={{
-                    position: "absolute",
-                    top: "50%"
-                }} onSelect={this.setDelay}>
-                    <Dropdown.Item eventKey="1" >Very Slow</Dropdown.Item>
-                    <Dropdown.Item eventKey="2" >Slow</Dropdown.Item>
-                    <Dropdown.Item eventKey="3">Normal</Dropdown.Item>
-                    <Dropdown.Item eventKey="4">Fast</Dropdown.Item>
-                    <Dropdown.Item eventKey="5">Superfast</Dropdown.Item>
-                </DropdownButton>
-                <Button id="maze" variant="primary" onClick={this.createMaze.bind(this)}>Create Maze</Button>
+            <div className="canvas-container">
+                <div className="container" >
+                    <span className="title">3D Pathfinding Visualizer</span>
+                    <Button id="edit" variant="primary" onClick={this.changeText}>{text}</Button>
+                    <DropdownButton id="dropdown-algorithms" title="Choose Algorithm" style={{
+                        display: "inline"
+                    }} onSelect={(evt, name) => {this.setAlgorithm(evt, name)}}>
+                        <Dropdown.Item eventKey="0" >{this.algorithms[0]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="1" >{this.algorithms[1]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="2">{this.algorithms[2]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="3">{this.algorithms[3]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="4">{this.algorithms[4]}</Dropdown.Item>
+                    </DropdownButton>
+                    <DropdownButton id="dropdown-speed" title="Choose Speed" style={{
+                        display: "inline"
+                    }} onSelect={(evt, name) => { this.setDelay(evt, name)}}>
+                         <Dropdown.Item eventKey="0" >{this.speed[0]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="1" >{this.speed[1]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="2">{this.speed[2]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="3">{this.speed[3]}</Dropdown.Item>
+                        <Dropdown.Item eventKey="4">{this.speed[4]}</Dropdown.Item>
+                    </DropdownButton>
+                    <Button id="visualize" variant="success" onClick={this.createGraph.bind(this)}>Start Visualization</Button>
+                    <Button id="maze" variant="primary" onClick={this.createMaze.bind(this)}>Create Maze</Button>
+                    <Button id="clearWalls" variant="danger" onClick={this.clearWalls}>Clear Walls</Button>
+                    <Button id="clearPath" variant="danger" onClick={this.clearPath}>Clear Path</Button>
+                </div>
+                <div ref={(mount) => { this.mount = mount }}></div>
             </div>
         );
         }

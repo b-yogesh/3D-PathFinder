@@ -1,21 +1,73 @@
+@font-face {
+  font-family: 'Yeager';
+  src: local('Yeager'), url(../assets/fonts/Yeager-Regular.otf) format('opentype');
+}
+
 .btn {
-    position: absolute;
+    /* position: absolute; */
     align-items: center;
     margin:1%;
   }
 
+.container{
+  position: absolute;
+  padding: 0px;
+  margin:0px;
+  max-width: 100%;
+  background-color: darkblue;
+  opacity: 0.8;
+}
+
+.title{
+  color: white;
+}
+
+#dropdown-algorithms{
+  background-color: #5ca739;
+  border-color: #5ca739;
+}
+
+#dropdown-speed{
+  background-color: #b8bb00;
+  border-color: #b8bb00;
+}
+
 #visualize{
-    top: 10%;
-}
-
-#clearWalls{
-  top: 20%; 
-}
-
-#clearPath{
-  top: 30%;
+  background-color: #5f00e3;
+  border-color: #5f00e3;
 }
 
 #maze{
-  top: 60%;
+  background-color: #02cebd;
+  border-color: #02cebd;
 }
+
+#alert{
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 30%;
+}
+
+.alert {
+  position: relative;
+}
+
+.alert .close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1em;
+}
+
+.alert .fa {
+  margin-right:.3em;
+}
+
+
+
+.canvas-container{
+  font-family: 'Yeager';
+  position: relative;
+}
+
