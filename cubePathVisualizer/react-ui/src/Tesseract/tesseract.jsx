@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useState } from "react";
 import ReactDOM from "react-dom";
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
@@ -11,7 +11,10 @@ import Graph from "../Algorithms/algorithms";
 import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
 import Maze from "../Algorithms/MazeAlgorithm";
 import * as $ from 'jquery';
+import Modal from "react-bootstrap/Modal";
+import content from "../Tutorial/content"
 
+import Tutorial from "../Tutorial/Tutorial"
 import Button from 'react-bootstrap/Button';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -44,7 +47,8 @@ export default class Tesseract extends React.Component {
         this.faceIndexAndCubeIndexToVertex = this.faceIndexAndCubeIndexToVertex.bind(this);
         this.setAlgorithm = this.setAlgorithm.bind(this);
         this.setDelay = this.setDelay.bind(this);
-        this.state = { text: "Change Start/End points"};
+        this.state = { text: "Change Start/End points",
+                        show: false};
     }
     
     
@@ -231,7 +235,7 @@ export default class Tesseract extends React.Component {
     }
     else{
         this.setState({ text:"Change Start/End points" });
-        document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
+        // document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
 
     }  
     this.toggle(); 
@@ -471,12 +475,12 @@ export default class Tesseract extends React.Component {
 
     toggle(){
         console.log("clicked....");
-        if(this.controls.enabled === false){
-            this.controls.enabled = true;
+        if(this.isEdit === true){
+            // this.controls.enabled = true;
             this.isEdit = false;
         }
         else{
-            this.controls.enabled = false;
+            // this.controls.enabled = false;
             this.isEdit = true;
         }
     }
@@ -640,6 +644,7 @@ export default class Tesseract extends React.Component {
     }
 
     createGraph(){
+        this.clearPath();
         var length = Object.keys(this.vertices).length;
         var graph = new Graph({length: length, vertices: this.vertices, cubeIndex: this.cubeIndex});
         console.log(this.vertices);
@@ -839,11 +844,19 @@ export default class Tesseract extends React.Component {
     }
 
 
+    openModal(){
+        console.log("enteres modeal");
+        this.setState({
+            show: !this.state.show
+          });
+    }
+
     render() {
         const { text } = this.state;
         this.algorithms = ["Breadth First Search","Depth First Search",
                            "Dijkastra","A* Search","Bidirectional BFS"];
-        this.speed = ["Very Slow","Slow","Normal","Fast","Superfast"]
+        this.speed = ["Very Slow","Slow","Normal","Fast","Superfast"];
+       console.log(content)
         return (
             <div className="canvas-container">
                 <div className="container" >
@@ -871,7 +884,9 @@ export default class Tesseract extends React.Component {
                     <Button id="maze" variant="primary" onClick={this.createMaze.bind(this)}>Create Maze</Button>
                     <Button id="clearWalls" variant="danger" onClick={this.clearWalls}>Clear Walls</Button>
                     <Button id="clearPath" variant="danger" onClick={this.clearPath}>Clear Path</Button>
+                    <Button id="openModal" variant="danger" onClick={this.openModal.bind(this)}>Open Modal</Button>
                 </div>
+                    <Tutorial message={content["message1"]} title={content["title1"]} show={this.state.show} onClose={this.openModal.bind(this)}></Tutorial>
                 <div ref={(mount) => { this.mount = mount }}></div>
                 <a id="github" href="https://github.com/b-yogesh/3D-PathFinder">
                     <img src={require('../assets/icons/github-logo.png')} alt="" style={{  width:"2vw"}}/>
