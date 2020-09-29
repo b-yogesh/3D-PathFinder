@@ -222,7 +222,6 @@ export default class Tesseract extends React.Component {
         this.source = 1;
         this.target = 7; 
         this.algo = 0;
-        this.openTutorial();
     }
 
         
