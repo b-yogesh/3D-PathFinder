@@ -209,6 +209,7 @@ export default class Tesseract extends React.Component {
         this.camera.position.x = 8;
         this.controls.update();
         document.addEventListener( 'mousedown', this.onDocumentMouseDown, false );
+        document.addEventListener( 'touchstart', this.onDocumentMouseDown, false );
         window.addEventListener("resize", this.onWindowResize, false);
         var mouse = new THREE.Vector2();
         this.mouse = mouse;
