@@ -307,7 +307,7 @@ export default class Tesseract extends React.Component {
             let position = new THREE.Vector3();
             position = this.intersects[intersectIndex].object.position;
             let ind = this.coordsToIndex(position);
-            console.log("ind...", ind);
+            //console.log("ind...", ind);
             let normal = new THREE.Vector3();
             normal = this.intersects[intersectIndex].face.normal;
 
@@ -714,7 +714,7 @@ export default class Tesseract extends React.Component {
         // let values = graph.bfs(this.source, this.target);
         let visitedNodesInOrder = values[0];
         let path = values[1];
-        if(path === undefined || path.length < 2){
+        if(path === undefined || !Array.isArray(path) || path.length < 2){
             alert("No path exists");
             return;
         }
