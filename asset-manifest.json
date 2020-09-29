@@ -1,0 +1,31 @@
+{
+  "files": {
+    "main.css": "/3D-PathFinder/static/css/main.e6358ef5.chunk.css",
+    "main.js": "/3D-PathFinder/static/js/main.98e29b2b.chunk.js",
+    "main.js.map": "/3D-PathFinder/static/js/main.98e29b2b.chunk.js.map",
+    "runtime-main.js": "/3D-PathFinder/static/js/runtime-main.50836a60.js",
+    "runtime-main.js.map": "/3D-PathFinder/static/js/runtime-main.50836a60.js.map",
+    "static/css/2.d9ad5f5c.chunk.css": "/3D-PathFinder/static/css/2.d9ad5f5c.chunk.css",
+    "static/js/2.7a4bc149.chunk.js": "/3D-PathFinder/static/js/2.7a4bc149.chunk.js",
+    "static/js/2.7a4bc149.chunk.js.map": "/3D-PathFinder/static/js/2.7a4bc149.chunk.js.map",
+    "index.html": "/3D-PathFinder/index.html",
+    "precache-manifest.97163ebb50961f0079df4dc2bb52ade7.js": "/3D-PathFinder/precache-manifest.97163ebb50961f0079df4dc2bb52ade7.js",
+    "service-worker.js": "/3D-PathFinder/service-worker.js",
+    "static/css/2.d9ad5f5c.chunk.css.map": "/3D-PathFinder/static/css/2.d9ad5f5c.chunk.css.map",
+    "static/css/main.e6358ef5.chunk.css.map": "/3D-PathFinder/static/css/main.e6358ef5.chunk.css.map",
+    "static/js/2.7a4bc149.chunk.js.LICENSE.txt": "/3D-PathFinder/static/js/2.7a4bc149.chunk.js.LICENSE.txt",
+    "static/media/tesseract.css": "/3D-PathFinder/static/media/Yeager-Regular.9b41ce91.otf",
+    "static/media/building1.jpg": "/3D-PathFinder/static/media/building1.e0724aec.jpg",
+    "static/media/building2.jpg": "/3D-PathFinder/static/media/building2.9ce44c23.jpg",
+    "static/media/building3.jpg": "/3D-PathFinder/static/media/building3.74480c90.jpg",
+    "static/media/info.png": "/3D-PathFinder/static/media/info.7547aa78.png",
+    "static/media/road.jpg": "/3D-PathFinder/static/media/road.8ae1404e.jpg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.50836a60.js",
+    "static/css/2.d9ad5f5c.chunk.css",
+    "static/js/2.7a4bc149.chunk.js",
+    "static/css/main.e6358ef5.chunk.css",
+    "static/js/main.98e29b2b.chunk.js"
+  ]
+}
