@@ -11,7 +11,6 @@ import Graph from "../Algorithms/algorithms";
 import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
 import Maze from "../Algorithms/MazeAlgorithm";
 import * as $ from 'jquery';
-import Modal from "react-bootstrap/Modal";
 import content from "../Tutorial/content"
 
 import Tutorial from "../Tutorial/Tutorial"
@@ -322,7 +321,7 @@ export default class Tesseract extends React.Component {
             else if(this.isEdit){
                 var index = this.intersects[intersectIndex].faceIndex;
                 console.log("changing to::::", intersects[intersectIndex]);
-                if(this.intersects[intersectIndex].object.name != this.OBSTACLE){
+                if(this.intersects[intersectIndex].object.name !== this.OBSTACLE){
                     if(this.startOrEnd === 1 && this.intersects[intersectIndex].object.geometry.faces[index].name !== this.END){
                         var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
                         this.removeStartingPoint(rPos.x, rPos.y, rPos.z, this.initialSFaceIndex);
@@ -415,12 +414,12 @@ export default class Tesseract extends React.Component {
                 }
             }
             if(intersectIndex === -1) return
-            if (this.intersects[intersectIndex] != this.INTERSECTED )//|| this.intersects[0].face ) 
+            if (this.intersects[intersectIndex] !== this.INTERSECTED )//|| this.intersects[0].face ) 
 		    {
                 if (this.INTERSECTED) {
                     console.log("removing from inside",this.INTERSECTED.face.name);
                     if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)
-                         && this.INTERSECTED.object.name != this.OBSTACLE){
+                         && this.INTERSECTED.object.name !== this.OBSTACLE){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
                         if(this.faceIndex % 2 === 0){
                             this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
@@ -441,7 +440,7 @@ export default class Tesseract extends React.Component {
                 console.log("intersect", this.INTERSECTED);
                 console.log("hover", this.intersects[intersectIndex].object.geometry.faces[parseInt(this.faceIndex)].name);
                 if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END
-                && this.INTERSECTED.object.name != this.OBSTACLE){
+                && this.INTERSECTED.object.name !== this.OBSTACLE){
                     helper.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
                 }
             }
@@ -450,7 +449,7 @@ export default class Tesseract extends React.Component {
             if (this.INTERSECTED) {
                 console.log("removing from outside");
                 if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END
-                && this.INTERSECTED.object.name != this.OBSTACLE)){
+                && this.INTERSECTED.object.name !== this.OBSTACLE)){
                 this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
                     if(this.faceIndex%2 === 0){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex+1)].color = this.INTERSECTED.currentColor;
@@ -624,7 +623,7 @@ export default class Tesseract extends React.Component {
             for (let y = -this.cubeIndex; y <= this.cubeIndex; y ++) {
                 for (let x = this.cubeIndex; x >= -this.cubeIndex; x --) {
                     var noOfFaces = helper.checkHowManyFaces(x,y,z, this.cubeIndex);
-                    if(noOfFaces!=0){
+                    if(noOfFaces!==0){
                         var index = this.coordsToIndex(new THREE.Vector3(x,y,z));
                         // var map = cubesToFaces[index];
                         var map = maps[index];

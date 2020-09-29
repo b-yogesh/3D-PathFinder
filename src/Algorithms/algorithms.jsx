@@ -1,11 +1,9 @@
 import React, {Component} from "react";
 import ReactDOM from "react-dom";
-import * as setFaceColor from "../Helpers/helper.js"
 import Queue from "./Queue"
 import Stack from "./Stack"
 import PriorityQueue from "./PriorityQueue"
 import * as helper from "../Helpers/helper.js"
-import * as THREE from "three";
 
 
 
@@ -105,7 +103,7 @@ export default class Graph extends React.Component  {
                                 if(parseInt(neigh) === parseInt(target)){
                                     console.log(pred);
                                     
-                                    while (pred[target] != -1) {
+                                    while (pred[target] !== -1) {
 
                                         path.push(pred[target]); 
                                         target = pred[target]; 
@@ -157,7 +155,7 @@ export default class Graph extends React.Component  {
                                 if(parseInt(neigh) === parseInt(target)){
                                     console.log(pred);
                                     
-                                    while (pred[target] != -1) {
+                                    while (pred[target] !== -1) {
 
                                         path.push(pred[target]); 
                                         target = pred[target]; 
@@ -213,7 +211,7 @@ export default class Graph extends React.Component  {
                     if(parseInt(neigh) === parseInt(target)){
                         console.log(pred);
                         
-                        while (pred[target] != -1) {
+                        while (pred[target] !== -1) {
                             
                             path.push(pred[target]); 
                             target = pred[target]; 
@@ -259,7 +257,7 @@ export default class Graph extends React.Component  {
             console.log(openSet, value);
             if(String(value.element) === String(target)){
                 console.log("Done");
-                while (pred[target] != -1) {
+                while (pred[target] !== -1) {
                             
                     path.push(pred[target]); 
                     target = pred[target]; 
@@ -295,7 +293,7 @@ export default class Graph extends React.Component  {
                             // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
                             if(String(neigh) === String(target)){
                                 console.log("Done in for loop", pred);
-                                while (pred[target] != -1) {
+                                while (pred[target] !== -1) {
                                             
                                     path.push(pred[target]); 
                                     target = pred[target]; 
@@ -323,7 +321,7 @@ export default class Graph extends React.Component  {
                             fScore[neigh] = fScore[neigh] + 1;
                             if(String(neigh) === String(target)){
                                 console.log("Done in for loop", pred);
-                                while (pred[target] != -1) {
+                                while (pred[target] !== -1) {
                                             
                                     path.push(pred[target]); 
                                     target = pred[target]; 
@@ -400,7 +398,7 @@ export default class Graph extends React.Component  {
 
             intersectNode = this.isIntersecting(this.s_visited, this.t_visited); 
 
-            if(intersectNode != -1) 
+            if(intersectNode !== -1) 
             { 
                 let path = this.printPath(this.s_parent, this.t_parent, source, target, intersectNode); 
                 return [visitedNodesInOrder, path]
@@ -433,14 +431,14 @@ export default class Graph extends React.Component  {
         path.push(intersectNode);
 
         let i = intersectNode;
-        while(s_parent[i]!=source){
+        while(s_parent[i]!==source){
             path.push(s_parent[i]);
             i=s_parent[i];
         }
 
         i = intersectNode;
         let reverse_path = []
-        while(t_parent[i]!=target){
+        while(t_parent[i]!==target){
             reverse_path.push(t_parent[i]);
             i=t_parent[i];
         }

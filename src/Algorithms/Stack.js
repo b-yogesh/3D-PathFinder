@@ -11,7 +11,7 @@ export default class Stack {
 
     pop() 
     {
-        if (this.items.length == 0) 
+        if (this.items.length === 0) 
             return "Underflow"; 
         return this.items.pop(); 
     } 
@@ -23,7 +23,7 @@ export default class Stack {
 
     isEmpty() 
     { 
-        return this.items.length == 0; 
+        return this.items.length === 0; 
     } 
 
     printStack() 

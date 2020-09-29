@@ -6,6 +6,7 @@ export default class Visualizer extends React.Component {
     constructor(props){
         super(props);
         let ts = new Tesseract();
+        this.ts = ts;
     }
 
     componentDidMount() {

@@ -35,7 +35,7 @@ export default function mapper(cubes, vertices, cubeIndex){
         let z = v[2];
         let index = v[3];
         let faceIndex= parseInt(v[4]);
-        if(!faceIndex%2!=0 && faceIndex != 0){
+        if(!faceIndex%2!==0 && faceIndex !== 0){
             faceIndex = v[4]-1
         }
         let direction = [];
@@ -49,7 +49,7 @@ export default function mapper(cubes, vertices, cubeIndex){
         if(noOfFaces-1){
             cornerOrEdgeNeighbours = []
             for(let j = 0; j<6; j++){
-                if(cubes[index].geometry.faces[j*2].vertex != undefined && j*2 != faceIndex){
+                if(cubes[index].geometry.faces[j*2].vertex !== undefined && j*2 !== faceIndex){
                     cornerOrEdgeNeighbours.push(cubes[index].geometry.faces[j*2].vertex)
                 }
             }
@@ -58,46 +58,46 @@ export default function mapper(cubes, vertices, cubeIndex){
         let left, right, top, bottom;
 
         if(faceIndex === 0 || faceIndex === 2){
-            if(y != cubeIndex)
+            if(y !== cubeIndex)
                 right = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                     helper.coordsToIndex(new THREE.Vector3(x, y+1 ,z)),vertices)
-            if(y != -cubeIndex)
+            if(y !== -cubeIndex)
                 left = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                     helper.coordsToIndex(new THREE.Vector3(x, y-1 ,z)),vertices)
-            if(z != cubeIndex)
+            if(z !== cubeIndex)
                 top = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                     helper.coordsToIndex(new THREE.Vector3(x, y ,z+1)),vertices)
-            if(z != -cubeIndex)
+            if(z !== -cubeIndex)
                 bottom = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                         helper.coordsToIndex(new THREE.Vector3(x, y ,z-1)),vertices)
         }
 
         if(faceIndex === 4 || faceIndex === 6){
-            if(x != cubeIndex)
+            if(x !== cubeIndex)
                 right = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                         helper.coordsToIndex(new THREE.Vector3(x+1, y ,z)),vertices)
-            if(x != -cubeIndex)
+            if(x !== -cubeIndex)
                 left = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                        helper.coordsToIndex(new THREE.Vector3(x-1, y ,z)),vertices)
-            if(z != cubeIndex)
+            if(z !== cubeIndex)
                 top = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                       helper.coordsToIndex(new THREE.Vector3(x, y ,z+1)),vertices)
-            if(z != -cubeIndex)
+            if(z !== -cubeIndex)
                 bottom = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                         helper.coordsToIndex(new THREE.Vector3(x, y ,z-1)),vertices)
         }
 
         if(faceIndex === 8 || faceIndex === 10){
-            if(x != cubeIndex)
+            if(x !== cubeIndex)
                 right = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                         helper.coordsToIndex(new THREE.Vector3(x+1, y ,z)),vertices)
-            if(x != -cubeIndex)
+            if(x !== -cubeIndex)
                 left = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                        helper.coordsToIndex(new THREE.Vector3(x-1, y ,z)),vertices)
-            if(y != cubeIndex)
+            if(y !== cubeIndex)
                 top = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                       helper.coordsToIndex(new THREE.Vector3(x, y+1 ,z)),vertices)
-            if(y != -cubeIndex)
+            if(y !== -cubeIndex)
                 bottom = helper.faceIndexAndCubeIndexToVertex(faceIndex, 
                         helper.coordsToIndex(new THREE.Vector3(x, y-1 ,z)),vertices)
         }   
