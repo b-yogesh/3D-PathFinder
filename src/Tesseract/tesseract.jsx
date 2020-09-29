@@ -222,7 +222,7 @@ export default class Tesseract extends React.Component {
         this.camera.position.y = 8;
         this.camera.position.x = 8;
         this.controls.update();
-        document.addEventListener( 'mouseup', this.onDocumentMouseDown, false );
+        document.addEventListener( 'mousedown', this.onDocumentMouseDown, false );
         document.addEventListener( 'touchstart', this.onDocumentMouseDown, false );
         window.addEventListener("resize", this.onWindowResize, false);
         var mouse = new THREE.Vector2();
@@ -307,7 +307,7 @@ export default class Tesseract extends React.Component {
             let position = new THREE.Vector3();
             position = this.intersects[intersectIndex].object.position;
             let ind = this.coordsToIndex(position);
-            //console.log("ind...", ind);
+            console.log("ind...", ind);
             let normal = new THREE.Vector3();
             normal = this.intersects[intersectIndex].face.normal;
 
