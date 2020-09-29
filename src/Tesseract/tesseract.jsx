@@ -12,6 +12,7 @@ import cubeToFaceMapper from "../Mappings/cubeToFaceMapper";
 import Maze from "../Algorithms/MazeAlgorithm";
 import * as $ from 'jquery';
 import content from "../Tutorial/content"
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 import Tutorial from "../Tutorial/Tutorial"
 import Button from 'react-bootstrap/Button';
@@ -72,7 +73,11 @@ export default class Tesseract extends React.Component {
         this.scene = scene;
         this.scene.background = new THREE.Color(0x121212);
         this.scene.fog = new THREE.Fog(0xffffff, 0, 150);
-    
+        this.stats = new Stats();
+        this.stats.dom.style.top = "auto";
+        this.stats.dom.style.bottom = '5px';
+        this.stats.dom.style.left = '3px';
+        this.mount.appendChild(this.stats.dom);
 
         var OBSTACLE = "obstacle";
         this.OBSTACLE = OBSTACLE;
@@ -132,7 +137,7 @@ export default class Tesseract extends React.Component {
             //     });
             this.cubes[cubeNum] = new THREE.Mesh(geometry, material);
             this.cubes[cubeNum].name = String(cubeNum);
-            // console.log(this.cubes[cubeNum]);
+            //console.log(this.cubes[cubeNum]);
            
             
             for(var i =0;i<12;i++){
@@ -154,13 +159,22 @@ export default class Tesseract extends React.Component {
             this.scene.add(this.edges[cubeNum])
         }
 
+        this.texture1 = loader.load(
+            require("../assets/images/building1.jpg"));
+    
+        this.texture2 = loader.load(
+            require("../assets/images/building2.jpg"));
+    
+        this.texture3 = loader.load(
+            require("../assets/images/building3.jpg"));
+
         let start_index = new THREE.Vector3();
         this.start_index = start_index
         this.start_index = {x:Math.floor(cubeDims / 2),y:-Math.floor(cubeDims / 2),z:Math.floor(cubeDims / 2)};
-        console.log("satrindex", this.start_index);
+        // console.log("satrindex", this.start_index);
         let cubeIndex = parseInt(cubeDims / 2)
         this.cubeIndex = cubeIndex;
-        console.log("cubeindex>:::", this.cubeIndex);
+        // console.log("cubeindex>:::", this.cubeIndex);
         let cubePositions = [];
         this.cubePositions = cubePositions;
         let STARTING_POINT = 0
@@ -208,7 +222,7 @@ export default class Tesseract extends React.Component {
         this.camera.position.y = 8;
         this.camera.position.x = 8;
         this.controls.update();
-        document.addEventListener( 'mousedown', this.onDocumentMouseDown, false );
+        document.addEventListener( 'mouseup', this.onDocumentMouseDown, false );
         document.addEventListener( 'touchstart', this.onDocumentMouseDown, false );
         window.addEventListener("resize", this.onWindowResize, false);
         var mouse = new THREE.Vector2();
@@ -226,12 +240,12 @@ export default class Tesseract extends React.Component {
 
         
     changeText(){
-    console.log(this.state.text, String(this.state.text) === "Change Start/End points");
+    // console.log(this.state.text, String(this.state.text) === "Change Start/End points");
     if(String(this.state.text) === "Change Start/End points"){
         var text =  "Exit Edit Mode";
         this.setState({ text: text },
         ()=>{
-            console.log(this.state.text);
+            // console.log(this.state.text);
         }); 
 
     }
@@ -245,11 +259,12 @@ export default class Tesseract extends React.Component {
 
 
     animate() {
-        // console.log("this...", this);
+        //console.log("this...", this);
         requestAnimationFrame( this.animate );
         
         this.renderer.render( this.scene, this.camera );
         this.controls.update();
+        this.stats.update();
     }
     
     
@@ -274,7 +289,7 @@ export default class Tesseract extends React.Component {
         this.intersects = intersects;
         //console.log(this.intersects);
         if(this.intersects.length > 0){
-            console.log(this.intersects[0]);
+            // console.log(this.intersects[0]);
             var intersectIndex = -1;
             for(var i=0;i<this.intersects.length;i++){
                 if(this.intersects[i].object.type === "Mesh"){
@@ -284,15 +299,15 @@ export default class Tesseract extends React.Component {
             }
             if(intersectIndex === -1) return
             //console.log(this.intersects[intersectIndex]);
-            console.log(this.intersects[intersectIndex]);
-            console.log("vertex",this.intersects[intersectIndex].face.vertex);
-            // console.log("name:::", this.intersects[intersectIndex].face.name);
+            // console.log(this.intersects[intersectIndex]);
+            // console.log("vertex",this.intersects[intersectIndex].face.vertex);
+            //console.log("name:::", this.intersects[intersectIndex].face.name);
             // intersects[0].object.material.color.setHex(Math.random() * 0xffffff);
             let faceIndex = this.intersects[intersectIndex].faceIndex;
             let position = new THREE.Vector3();
             position = this.intersects[intersectIndex].object.position;
             let ind = this.coordsToIndex(position);
-            // console.log("ind...", ind);
+            //console.log("ind...", ind);
             let normal = new THREE.Vector3();
             normal = this.intersects[intersectIndex].face.normal;
 
@@ -300,7 +315,7 @@ export default class Tesseract extends React.Component {
             let geoX, geoY, geoZ = 0;
             
             if( this.intersects[intersectIndex].face.name === this.START || this.intersects[intersectIndex].face.name === this.END){
-                console.log("worked");
+                // console.log("worked");
                 if(this.isEdit){
                     document.addEventListener( 'mousemove', this.onDocumentMouseMove, false );
                     if(this.intersects[intersectIndex].face.name === this.START){
@@ -321,7 +336,7 @@ export default class Tesseract extends React.Component {
             }
             else if(this.isEdit){
                 var index = this.intersects[intersectIndex].faceIndex;
-                console.log("changing to::::", intersects[intersectIndex]);
+                // console.log("changing to::::", intersects[intersectIndex]);
                 if(this.intersects[intersectIndex].object.name !== this.OBSTACLE){
                     if(this.startOrEnd === 1 && this.intersects[intersectIndex].object.geometry.faces[index].name !== this.END){
                         var rPos = this.cubes[this.coordsToIndex(this.initialStartCoord)].position;
@@ -418,7 +433,7 @@ export default class Tesseract extends React.Component {
             if (this.intersects[intersectIndex] !== this.INTERSECTED )//|| this.intersects[0].face ) 
 		    {
                 if (this.INTERSECTED) {
-                    console.log("removing from inside",this.INTERSECTED.face.name);
+                    // console.log("removing from inside",this.INTERSECTED.face.name);
                     if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END)
                          && this.INTERSECTED.object.name !== this.OBSTACLE){
                         this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
@@ -438,8 +453,8 @@ export default class Tesseract extends React.Component {
                 let faceIndex = this.INTERSECTED.faceIndex;  
                 this.faceIndex = faceIndex;
                 this.INTERSECTED.currentColor = this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color;
-                console.log("intersect", this.INTERSECTED);
-                console.log("hover", this.intersects[intersectIndex].object.geometry.faces[parseInt(this.faceIndex)].name);
+                // console.log("intersect", this.INTERSECTED);
+                // console.log("hover", this.intersects[intersectIndex].object.geometry.faces[parseInt(this.faceIndex)].name);
                 if(this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(faceIndex)].name !== this.END
                 && this.INTERSECTED.object.name !== this.OBSTACLE){
                     helper.setFaceColor(this.INTERSECTED.object.geometry, this.hoverUseColor, this.faceIndex);
@@ -448,7 +463,7 @@ export default class Tesseract extends React.Component {
         } 
         else {
             if (this.INTERSECTED) {
-                console.log("removing from outside");
+                // console.log("removing from outside");
                 if( (this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.START && this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].name !== this.END
                 && this.INTERSECTED.object.name !== this.OBSTACLE)){
                 this.INTERSECTED.object.geometry.faces[parseInt(this.faceIndex)].color = this.INTERSECTED.currentColor;
@@ -476,7 +491,7 @@ export default class Tesseract extends React.Component {
 
 
     toggle(){
-        console.log("clicked....");
+        // console.log("clicked....");
         if(this.isEdit === true){
             // this.controls.enabled = true;
             this.isEdit = false;
@@ -489,7 +504,7 @@ export default class Tesseract extends React.Component {
     
 
     createStartingPoint(x,y,z, faceIndex){
-        console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        // console.log("starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.source = this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].vertex;
         var color = new THREE.Color( 0xff0000 );
         this.initialStartCoord = {x,y,z};
@@ -505,7 +520,7 @@ export default class Tesseract extends React.Component {
     
     
     createEndingPoint(x,y,z, faceIndex){
-        console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        // console.log("ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         this.target = this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].vertex;
         this.initialEndCoord = {x,y,z};
         var color = new THREE.Color( 0x04b31b );
@@ -520,7 +535,7 @@ export default class Tesseract extends React.Component {
     }
 
     removeStartingPoint(x,y,z, faceIndex){
-        console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        // console.log("removed starting poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
@@ -533,7 +548,7 @@ export default class Tesseract extends React.Component {
 
 
     removeEndingPoint(x,y,z, faceIndex){
-        console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
+        // console.log("removed ending poijt is:::", this.coordsToIndex(new THREE.Vector3(x,y,z)));
         helper.setFaceColor(this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry, this.mazeColor, faceIndex);
         this.cubes[this.coordsToIndex(new THREE.Vector3(x,y,z))].geometry.faces[faceIndex].name = "";
         if(faceIndex%2 === 0){
@@ -546,7 +561,7 @@ export default class Tesseract extends React.Component {
 
 
     createObstacle(geoX,geoY,geoZ,offsetX,offsetY,offsetZ,intersectIndex,faceIndex){
-        console.log("creating obstacle");
+        // console.log("creating obstacle");
         let pos = this.intersects[intersectIndex].object.position;
         let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
         let material;
@@ -554,22 +569,18 @@ export default class Tesseract extends React.Component {
         let rand = Math.random();
         let texture;
         if(rand < 0.33){
-            texture = loader.load(
-                require("../assets/images/building1.jpg"));
+            texture = this.texture1;
         }
         else if(rand > 0.66){
-            texture = loader.load(
-                require("../assets/images/building2.jpg"));
+            texture = this.texture2; 
         }
         else{
-            texture = loader.load(
-                require("../assets/images/building3.jpg"));
+            texture = this.texture3;
         }
         
         
         material = new THREE.MeshBasicMaterial({
             map: texture
-    
         });
         // const material = new THREE.MeshPhongMaterial({
         //     color: 0x00f00f,
@@ -580,14 +591,14 @@ export default class Tesseract extends React.Component {
         obstacle.name = this.OBSTACLE;
         // obstacle.vertex = this.vertices[];
         // groupCubes.add(cubes[cubeNum]);
-        obstacle.castShadow = true;
-        obstacle.receiveShadow = true;
+        // obstacle.castShadow = true;
+        // obstacle.receiveShadow = true;
         this.scene.add(obstacle); 
         obstacle.position.setY = 25;
-        new TWEEN.Tween(obstacle.position)
-                        .to({ y: 10}, 2000)
-                        .easing(TWEEN.Easing.Bounce.Out)
-                        .start();
+        // new TWEEN.Tween(obstacle.position)
+        //                 .to({ y: 10}, 2000)
+        //                 .easing(TWEEN.Easing.Bounce.Out)
+        //                 .start();
         this.intersects[intersectIndex].object.geometry.faces[faceIndex].isAWall = true;
         let vertexIndex = this.faceIndexAndCubeIndexToVertex(faceIndex, this.coordsToIndex(new THREE.Vector3(pos.x,pos.y,pos.z)));
         obstacle.vertexIndex = vertexIndex;
@@ -601,15 +612,15 @@ export default class Tesseract extends React.Component {
 
 
     removeObstacle(intersectIndex){
-        console.log("remving obstacle", this.intersects[intersectIndex].object.vertexIndex);
+        // console.log("remving obstacle", this.intersects[intersectIndex].object.vertexIndex);
         let p = this.intersects[intersectIndex].object.position;
         let vertexIndex = this.intersects[intersectIndex].object.vertexIndex;
-        console.log("vertexIndex...", vertexIndex);
+        // console.log("vertexIndex...", vertexIndex);
         this.cubes[this.vertices[vertexIndex][3]].geometry.faces[this.vertices[vertexIndex][4]].isAWall = false;
 
         let uuid = this.intersects[intersectIndex].object.uuid;
         const object = this.scene.getObjectByProperty( 'uuid', uuid );
-        console.log(object);
+        // console.log(object);
         object.geometry.dispose();
         object.material.dispose();
         this.scene.remove( object );
@@ -628,7 +639,7 @@ export default class Tesseract extends React.Component {
                         var index = this.coordsToIndex(new THREE.Vector3(x,y,z));
                         // var map = cubesToFaces[index];
                         var map = maps[index];
-                        // console.log("mpa and indx:::", map, index, this.cubeIndex)
+                       // console.log("mpa and indx:::", map, index, this.cubeIndex)
                         for(var i = 0; i < noOfFaces; i++){
                             //console.log(map[i]);
                             //console.log(vertex,x,y,z);
@@ -649,7 +660,7 @@ export default class Tesseract extends React.Component {
         this.clearPath();
         var length = Object.keys(this.vertices).length;
         var graph = new Graph({length: length, vertices: this.vertices, cubeIndex: this.cubeIndex});
-        console.log(this.vertices);
+        // console.log(this.vertices);
         for(let key in this.vertices){
             graph.addVertex(key);
         }
@@ -663,7 +674,7 @@ export default class Tesseract extends React.Component {
             }
             
         }
-        console.log("walls", wallNodes);
+        // console.log("walls", wallNodes);
         for(let edge in edgesMapping){
             let e = edgesMapping[edge];
             let index = this.vertices[edge][3];
@@ -685,10 +696,10 @@ export default class Tesseract extends React.Component {
             return;
         }
         let values;
-        console.log("came here", this.algo);
+        // console.log("came here", this.algo);
         switch(parseInt(this.algo)){
             case 0:
-                 console.log("came here");
+                //  console.log("came here");
                  values = graph.bfs(this.source, this.target); break;
             case 1:
                  values = graph.dfs(this.source, this.target); break;
@@ -703,12 +714,12 @@ export default class Tesseract extends React.Component {
         // let values = graph.bfs(this.source, this.target);
         let visitedNodesInOrder = values[0];
         let path = values[1];
-        console.log("path is...", path, path.length);
-        console.log("nodes...", visitedNodesInOrder);
-        if(path.length < 2){
+        if(path === undefined || path.length < 2){
             alert("No path exists");
             return;
         }
+        // console.log("path is...", path, path.length);
+        // console.log("nodes...", visitedNodesInOrder);
         this.animateVisitedNodes(visitedNodesInOrder, path);
     }
 
@@ -803,7 +814,7 @@ export default class Tesseract extends React.Component {
 
     setAlgorithm(evt, name){
         this.algo = evt; 
-        console.log(this.algo,name);
+        // console.log(this.algo,name);
         $("#dropdown-algorithms").text(this.algorithms[this.algo]); 
     }
 
@@ -825,7 +836,7 @@ export default class Tesseract extends React.Component {
                 this.delay = 1;
                 break;
         }
-        console.log(this.delay);
+        // console.log(this.delay);
         $("#dropdown-speed").text(this.speed[delay]);
     }
 
@@ -837,9 +848,9 @@ export default class Tesseract extends React.Component {
             cubeIndex: this.cubeIndex,
             cubes: this.cubes,
         });
-        console.log("befire", this.cubes[0]);
+        // console.log("befire", this.cubes[0]);
         let obstacles = maze.createMaze();
-        console.log(obstacles, this.cubes[3]);
+        // console.log(obstacles, this.cubes[3]);
         for(let obstacle in obstacles){
             this.scene.add(obstacles[obstacle])
         }
@@ -853,7 +864,7 @@ export default class Tesseract extends React.Component {
         document.removeEventListener( 'mousedown', this.onDocumentMouseDown, false );
         document.removeEventListener( 'mousemove', this.onDocumentMouseMove, false );
         this.tutorialIndex = 0;
-        console.log("enteres modeal",this.tutorialIndex);
+        // console.log("enteres modeal",this.tutorialIndex);
         this.setState({
             show: this.tutorialIndex
           });
@@ -865,7 +876,7 @@ export default class Tesseract extends React.Component {
         document.addEventListener( 'mousemove', this.onDocumentMouseMove, false );
         $(".canvas-container").removeClass("blur-filter");
         this.tutorialIndex = -1;
-        console.log("clsoing modeal",this.tutorialIndex);
+        // console.log("clsoing modeal",this.tutorialIndex);
         this.setState({
             show: this.tutorialIndex
           });
@@ -874,7 +885,7 @@ export default class Tesseract extends React.Component {
 
     nextTutorial(){
         this.tutorialIndex++;
-        console.log("next modeal",this.tutorialIndex);
+        // console.log("next modeal",this.tutorialIndex);
         this.setState({
             show: this.tutorialIndex
           });
@@ -883,7 +894,7 @@ export default class Tesseract extends React.Component {
 
     previousTutorial(){
         this.tutorialIndex--;
-        console.log("next modeal",this.tutorialIndex);
+        // console.log("next modeal",this.tutorialIndex);
         this.setState({
             show: this.tutorialIndex
           });
@@ -894,7 +905,7 @@ export default class Tesseract extends React.Component {
         this.algorithms = ["Breadth First Search","Depth First Search",
                            "Dijkastra","A* Search","Bidirectional BFS"];
         this.speed = ["Very Slow","Slow","Normal","Fast","Superfast"];
-       console.log(content, this.state.show)
+    //    console.log(content, this.state.show)
         return (
             <div>
             <div className="canvas-container">

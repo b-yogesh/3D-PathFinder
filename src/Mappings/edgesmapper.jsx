@@ -27,7 +27,7 @@ export default function mapper(cubes, vertices, cubeIndex){
 
 
     let neighbours = {}
-    console.log(cubeIndex);
+    // console.log(cubeIndex);
     for(let i in vertices){
         let v = vertices[i];
         let x = v[0];

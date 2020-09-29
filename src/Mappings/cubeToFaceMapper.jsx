@@ -17,7 +17,7 @@ export default function cubeToFaceMapper(cubeIndex){
     }
 
     let mapper = {};
-    console.log("cubeIndx", cubeIndex);
+    // console.log("cubeIndx", cubeIndex);
     for (let z = cubeIndex; z >= -cubeIndex; z--) {
         for (let y = -cubeIndex; y <= cubeIndex; y ++) {
             for (let x = cubeIndex; x >= -cubeIndex; x --) {
@@ -39,7 +39,7 @@ export default function cubeToFaceMapper(cubeIndex){
             }
         }
     }
-    console.log("mapper:::::",mapper);
+    // console.log("mapper:::::",mapper);
     return mapper;
 
 }

@@ -12,8 +12,8 @@ export default class Maze extends React.Component  {
         constructor(props)
         { 
             super(props);
-            console.log("Creating Maze");
-            console.log(props);
+            // console.log("Creating Maze");
+            // console.log(props);
             this.noOfVertices = props.length; 
             this.vertices = props.vertices;
             this.cubeIndex = props.cubeIndex;
@@ -53,7 +53,7 @@ export default class Maze extends React.Component  {
 
             for(var i =0; i< this.noOfVertices; i++){
                 let rand = Math.random()
-                console.log(rand);
+                // console.log(rand);
                  if(rand<0.25){
                     this.createWalls(this.vertices[i]);
                  }
@@ -67,11 +67,11 @@ export default class Maze extends React.Component  {
             let z = vertex[2];
             let index = vertex[3];
             let faceIndex = vertex[4];
-            console.log(this.cubes[index].geometry.faces[faceIndex].name);
+            // console.log(this.cubes[index].geometry.faces[faceIndex].name);
             let name = this.cubes[index].geometry.faces[faceIndex].name;
             if(name === "start" || name === "end" || this.cubes[index].geometry.faces[faceIndex].isAWall) return
             let normal = this.cubes[index].geometry.faces[faceIndex].normal;
-            console.log("normal", normal);
+            // console.log("normal", normal);
             let offsetX, offsetY, offsetZ = 0;
             let geoX, geoY, geoZ = 0;
             if(normal.x === 1){
@@ -124,9 +124,9 @@ export default class Maze extends React.Component  {
             }
 
 
-            console.log("creating obstacle");
+            // console.log("creating obstacle");
             let pos = this.cubes[index].position;
-            console.log(pos, x, y, z);
+            // console.log(pos, x, y, z);
             let geometry = new THREE.BoxGeometry(geoX,geoY,geoZ);
             
             // });

@@ -12,8 +12,8 @@ export default class Graph extends React.Component  {
         constructor(props)
         { 
             super(props);
-            console.log("Creating graph");
-            console.log(props);
+            // console.log("Creating graph");
+            // console.log(props);
             this.noOfVertices = props.length; 
             this.AdjList = new Map(); 
             this.delay = 50;
@@ -60,7 +60,7 @@ export default class Graph extends React.Component  {
                 for (var j of get_values) 
                     conc += j + " "; 
         
-                console.log(i + " -> " + conc); 
+                // console.log(i + " -> " + conc); 
                 } 
         }
       
@@ -69,7 +69,7 @@ export default class Graph extends React.Component  {
             const INF = 1000000;
             let visitedNodesInOrder = [];
             var distances = Array(this.noOfVertices).fill(INF);
-            console.log(startingNode, target);
+            // console.log(startingNode, target);
             distances[startingNode] = 0;
             var pred = []; 
              for (var i = 0; i < this.noOfVertices; i++)
@@ -86,11 +86,11 @@ export default class Graph extends React.Component  {
             //path.push(target);
             while (!q.isEmpty()) { 
                 var getQueueElement = q.dequeue(); 
-                 console.log(getQueueElement); 
+                //  console.log(getQueueElement); 
                 var get_List = this.AdjList.get(String(getQueueElement)); 
-                 console.log("Getlist", get_List, q, this.AdjList,  this.AdjList.get(String(getQueueElement)));
+                //  console.log("Getlist", get_List, q, this.AdjList,  this.AdjList.get(String(getQueueElement)));
                 for (var i in get_List) {
-                        console.log("i...",i,get_List);
+                        // console.log("i...",i,get_List);
                         var neigh = get_List[i]; 
                         if (!visited[neigh]) { 
                             visited[neigh] = true; 
@@ -99,9 +99,9 @@ export default class Graph extends React.Component  {
                                 distances[neigh] = distances[getQueueElement] + 1;
                                 pred[neigh] = getQueueElement;
                                 q.enqueue(neigh);
-                                // console.log(neigh,vertices[neigh] );
+                                //console.log(neigh,vertices[neigh] );
                                 if(parseInt(neigh) === parseInt(target)){
-                                    console.log(pred);
+                                    // console.log(pred);
                                     
                                     while (pred[target] !== -1) {
 
@@ -109,8 +109,8 @@ export default class Graph extends React.Component  {
                                         target = pred[target]; 
                                     }
                                     
-                                    // console.log(path);
-                                    console.log(visitedNodesInOrder);
+                                    //console.log(path);
+                                    // console.log(visitedNodesInOrder);
                                     return [visitedNodesInOrder, path];
                                 }
                             } 
@@ -126,7 +126,7 @@ export default class Graph extends React.Component  {
             const INF = 1000000;
             let visitedNodesInOrder = [];
             var distances = Array(this.noOfVertices).fill(INF);
-            console.log(startingNode, target);
+            // console.log(startingNode, target);
             distances[startingNode] = 0;
             var pred = []; 
              for (var i = 0; i < this.noOfVertices; i++)
@@ -151,9 +151,9 @@ export default class Graph extends React.Component  {
                                 distances[neigh] = distances[v] + 1;
                                 pred[neigh] = v;
                                 s.push(neigh);
-                                // console.log(neigh,vertices[neigh] );
+                                //console.log(neigh,vertices[neigh] );
                                 if(parseInt(neigh) === parseInt(target)){
-                                    console.log(pred);
+                                    // console.log(pred);
                                     
                                     while (pred[target] !== -1) {
 
@@ -161,8 +161,8 @@ export default class Graph extends React.Component  {
                                         target = pred[target]; 
                                     }
                                     
-                                    // console.log(path);
-                                    console.log(visitedNodesInOrder);
+                                   // console.log(path);
+                                    // console.log(visitedNodesInOrder);
                                     return [visitedNodesInOrder, path];
                                 }
                             } 
@@ -178,7 +178,7 @@ export default class Graph extends React.Component  {
         const INF = 1000000;
         let visitedNodesInOrder = [];
         var distances = Array(this.noOfVertices).fill(INF);
-        console.log(startingNode, target);
+        // console.log(startingNode, target);
         distances[startingNode] = 0;
         var pred = []; 
         for (var i = 0; i < this.noOfVertices; i++)
@@ -191,25 +191,25 @@ export default class Graph extends React.Component  {
         var path = [];
         while(!pq.isEmpty()){
             let value = pq.front();
-            console.log(value);
+            // console.log(value);
             pq.dequeue();
             var d = value.priority;
             var v = value.element;
             if(d > distances[v]) continue
             var get_List = this.AdjList.get(String(v)); 
-            console.log(get_List);
+            // console.log(get_List);
             for(var i in get_List){
                 var neigh = get_List[i];
                 var w = weight[neigh];
-                console.log(neigh, w); 
-                console.log(distances[v] + w < distances[neigh]);
+                // console.log(neigh, w); 
+                // console.log(distances[v] + w < distances[neigh]);
                 if(distances[v] + w < distances[neigh]){
                     distances[neigh] = distances[v] + w;
                     pq.enqueue(distances[neigh], neigh); 
                     visitedNodesInOrder.push(neigh);
                     pred[neigh] = v;
                     if(parseInt(neigh) === parseInt(target)){
-                        console.log(pred);
+                        // console.log(pred);
                         
                         while (pred[target] !== -1) {
                             
@@ -217,8 +217,8 @@ export default class Graph extends React.Component  {
                             target = pred[target]; 
                         }
                         
-                        // console.log(path);
-                        console.log(visitedNodesInOrder);
+                        //console.log(path);
+                        // console.log(visitedNodesInOrder);
                         return [visitedNodesInOrder, path];
                     }
                 }  
@@ -231,7 +231,7 @@ export default class Graph extends React.Component  {
     a_star(startingNode, target){
         let visitedNodesInOrder = [];
         const INF = 1000000;
-        console.log(startingNode, target);
+        // console.log(startingNode, target);
         var pred = []; 
         var gScore = [];
         var fScore = [];
@@ -251,20 +251,20 @@ export default class Graph extends React.Component  {
         openSet.enqueue(fScore[startingNode], startingNode); 
         var path = [];
         let parent = [];
-        console.log(openSet.isEmpty())
+        // console.log(openSet.isEmpty())
         while(!openSet.isEmpty()){
             let value = openSet.front();
-            console.log(openSet, value);
+            // console.log(openSet, value);
             if(String(value.element) === String(target)){
-                console.log("Done");
+                // console.log("Done");
                 while (pred[target] !== -1) {
                             
                     path.push(pred[target]); 
                     target = pred[target]; 
                 }
                 
-                console.log(path);
-                console.log(visitedNodesInOrder);
+                // console.log(path);
+                // console.log(visitedNodesInOrder);
                 return [visitedNodesInOrder, path];
             }
             openSet.dequeue();
@@ -272,80 +272,80 @@ export default class Graph extends React.Component  {
             var v = value.element;
             closedSet.push(String(v));
             var get_List = this.AdjList.get(String(v)); 
-            console.log(get_List);
+            // console.log(get_List);
             for(var i in get_List){
                 var neigh = get_List[i];
-                console.log(neigh); 
+                // console.log(neigh); 
                 if(!closedSet.includes(neigh)){
                     let tempGScore = gScore[v] + this.heuristic(this.vertices[String(neigh)], this.vertices[String(v)]);
-                    console.log("gScores:::", tempGScore, gScore[neigh])
+                    // console.log("gScores:::", tempGScore, gScore[neigh])
                     var vertex = this.vertices[String(neigh)]
                     var currentVertex = this.vertices[String(v)]
                     if(openSet.includes(neigh)){
                         if(tempGScore < gScore[neigh]){
-                            console.log("if here",closedSet, neigh)
+                            // console.log("if here",closedSet, neigh)
                             pred[neigh] = v;
                             var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
-                            console.log("Face",facePenalty);
+                            // console.log("Face",facePenalty);
                             gScore[neigh] = tempGScore;
                             hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
                             fScore[neigh] = gScore[neigh] + hScore[neigh];
                             // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
                             if(String(neigh) === String(target)){
-                                console.log("Done in for loop", pred);
+                                // console.log("Done in for loop", pred);
                                 while (pred[target] !== -1) {
                                             
                                     path.push(pred[target]); 
                                     target = pred[target]; 
-                                    console.log(path);
+                                    // console.log(path);
                                 }
                                 
-                                console.log(path);
-                                console.log(visitedNodesInOrder);
+                                // console.log(path);
+                                // console.log(visitedNodesInOrder);
                                 return [visitedNodesInOrder, path];
                             }
                             }
                         }
                         else{
-                            console.log("else here",closedSet, neigh)
+                            // console.log("else here",closedSet, neigh)
                             pred[neigh] = v;
                             gScore[neigh] = tempGScore;
                             var facePenalty = helper.checkHowManyFaces(vertex[0],vertex[1],vertex[2], this.cubeIndex);
-                            console.log("else Face",facePenalty);
+                            // console.log("else Face",facePenalty);
                             hScore[neigh] = this.heuristic(this.vertices[String(neigh)], this.vertices[String(target)]);
                             fScore[neigh] = gScore[neigh] + hScore[neigh];
                             // if(facePenalty-1) fScore[neigh] = fScore[neigh] + 1;
                             // try adding penalty only if current face and neigh lie on same co ordinates
-                            console.log(currentVertex, vertex, currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2])
+                            // console.log(currentVertex, vertex, currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2])
                             if(currentVertex[0] === vertex[0] && currentVertex[1] === vertex[1] && currentVertex[2] === vertex[2]) 
                             fScore[neigh] = fScore[neigh] + 1;
                             if(String(neigh) === String(target)){
-                                console.log("Done in for loop", pred);
+                                // console.log("Done in for loop", pred);
                                 while (pred[target] !== -1) {
                                             
                                     path.push(pred[target]); 
                                     target = pred[target]; 
-                                    console.log(path);
+                                    // console.log(path);
                                 }
                                 
-                                console.log(path);
-                                console.log(visitedNodesInOrder);
+                                // console.log(path);
+                                // console.log(visitedNodesInOrder);
                                 return [visitedNodesInOrder, path];
                             }
                             visitedNodesInOrder.push(neigh);
                             openSet.enqueue(fScore[neigh], neigh);
                         }   
             }
-            console.log("fScores:::",fScore[neigh]) 
+            // console.log("fScores:::",fScore[neigh]) 
         } 
-        console.log("openset after loop:::", openSet.printPQueue())
+        // console.log("openset after loop:::", openSet.printPQueue())
     } 
-        console.log(visitedNodesInOrder, closedSet)  
+        // console.log(visitedNodesInOrder, closedSet)  
         return visitedNodesInOrder
     }
 
     heuristic(a,b){
-        // console.log("heuristic", a,b, this.AdjList);
+        //console.log("heuristic", a,b, this.AdjList);
         // var heuristic = Math.sqrt(Math.pow((a[0] - b[0]),2) + 
         //                           Math.pow((a[1] - b[1]),2) +
         //                           Math.pow((a[2] - b[2]),2))
@@ -353,7 +353,7 @@ export default class Graph extends React.Component  {
         var heuristic = Math.abs((a[0] - b[0]))+ 
                         Math.abs((a[1] - b[1]))+
                         Math.abs((a[2] - b[2]))
-        console.log("heuristic:::", heuristic)                        
+        // console.log("heuristic:::", heuristic)                        
         return heuristic;
     }
 
@@ -377,12 +377,12 @@ export default class Graph extends React.Component  {
         this.s_parent = s_parent;
         this.t_parent = t_parent;
         let intersectNode = -1;
-        console.log(this.s_visited);
+        // console.log(this.s_visited);
         for(var i = 0; i<this.noOfVertices; i++){
             this.s_visited.push(false); 
             this.t_visited.push(false); 
         }
-        console.log(this.s_visited);
+        // console.log(this.s_visited);
         this.s_queue.enqueue(source); 
         this.s_visited[source] = true; 
         this.s_parent[source]=-1; 
@@ -392,7 +392,7 @@ export default class Graph extends React.Component  {
         this.t_parent[target] = -1; 
 
         while (!this.s_queue.isEmpty() && !this.t_queue.isEmpty()){
-            console.log("Queues....", this.s_queue, this.t_queue)
+            // console.log("Queues....", this.s_queue, this.t_queue)
             this.biBFS(this.s_queue, this.s_visited, this.s_parent);
             this.biBFS(this.t_queue, this.t_visited, this.t_parent);
 
@@ -414,7 +414,7 @@ export default class Graph extends React.Component  {
         var get_List = this.AdjList.get(String(current)); 
         for(var i in get_List){
             var neigh = get_List[i];
-            console.log(neigh); 
+            // console.log(neigh); 
             if(!visited[neigh]){
                 this.visitedNodesInOrder.push(neigh);
                 parent[neigh] = current;
@@ -446,7 +446,7 @@ export default class Graph extends React.Component  {
         reverse_path = reverse_path.reverse();
         path = path.concat(reverse_path);
         for(i = 0; i < path.length; i++){
-            console.log(path[i]);
+            // console.log(path[i]);
         }
 
         let newPath = [];
@@ -459,7 +459,7 @@ export default class Graph extends React.Component  {
 
 
         for(i = 0; i < path.length; i++){
-            console.log("newpath...", newPath[i]);
+            // console.log("newpath...", newPath[i]);
         }
         
         return newPath;

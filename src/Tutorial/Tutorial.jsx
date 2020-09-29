@@ -7,13 +7,13 @@ import * as $ from 'jquery';
 export default class Modal extends React.Component {
 
     render() {
-        console.log(this.props);
+        // console.log(this.props);
         if(!this.props.show){
             // $(".canvas-container").removeClass("blur-filter"); 
             return null;
         }
         
-        console.log(this.props.index);
+        // console.log(this.props.index);
         let disableNext = false;
         if(this.props.index===8) disableNext = true;
         return (
