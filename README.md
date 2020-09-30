@@ -80,5 +80,6 @@ My main inspiration to develop this project was Clément Mihailescu's [Pathfindi
 
    [Summer 2020 Contest]: <https://www.algoexpert.io/swe-project-contests/2020-summer>
    [Three.js]: <https://threejs.org/>
+   [here]: <https://b-yogesh.github.io/3D-PathFinder/>
    [Pathfinding project]: <https://github.com/clementmihailescu/Pathfinding-Visualizer>
   
