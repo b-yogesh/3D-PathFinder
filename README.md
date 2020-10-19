@@ -1,7 +1,5 @@
 # 3D-Pathfinder
 
-This project was developed as a submission for the AlgoExpert.io [Summer 2020 Contest]
-
 3D-Pathfinder is a fluid 3D, easy to understand and a new way to visualize pathfinding algorithms built on [Three.js].
 
 ![3d2](https://user-images.githubusercontent.com/22027039/94605299-348f7200-0299-11eb-9750-6c91eed92ee6.png)
